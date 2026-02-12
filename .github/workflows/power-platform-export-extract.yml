@@ -138,15 +138,38 @@ jobs:
           # Ensure PATH includes dotnet tools
           export PATH="$PATH:$HOME/.dotnet/tools"
           
+          # Set environment variables for authentication
+          export POWERPLATFORM_ENVIRONMENT_URL="${{ env.ENVIRONMENT_URL }}"
+          export POWERPLATFORM_APP_ID="${{ secrets.POWERPLATFORM_APP_ID }}"
+          export POWERPLATFORM_CLIENT_SECRET="${{ secrets.POWERPLATFORM_CLIENT_SECRET }}"
+          export POWERPLATFORM_TENANT_ID="${{ secrets.POWERPLATFORM_TENANT_ID }}"
+          
+          echo "[INFO] Attempting service principal authentication..."
+          
+          # Try service principal authentication with correct parameters
           $HOME/.dotnet/tools/pac auth create \
-            --url "${{ env.ENVIRONMENT_URL }}" \
-            --username "${{ secrets.POWERPLATFORM_APP_ID }}" \
-            --password "${{ secrets.POWERPLATFORM_CLIENT_SECRET }}" \
-            --tenant "${{ secrets.POWERPLATFORM_TENANT_ID }}" || {
-              echo "[ERROR] Authentication failed"
-              exit 1
+            -aadAppId "${{ secrets.POWERPLATFORM_APP_ID }}" \
+            -clientSecret "${{ secrets.POWERPLATFORM_CLIENT_SECRET }}" \
+            -tenantId "${{ secrets.POWERPLATFORM_TENANT_ID }}" \
+            --environment "${{ env.ENVIRONMENT_URL }}" || {
+              echo "[ERROR] Service principal auth failed, trying alternative method..."
+              
+              # Try alternative parameter names
+              $HOME/.dotnet/tools/pac auth create \
+                --application-id "${{ secrets.POWERPLATFORM_APP_ID }}" \
+                --client-secret "${{ secrets.POWERPLATFORM_CLIENT_SECRET }}" \
+                --tenant-id "${{ secrets.POWERPLATFORM_TENANT_ID }}" \
+                --environment "${{ env.ENVIRONMENT_URL }}" || {
+                  echo "[ERROR] Authentication failed with both methods"
+                  echo "[INFO] PAC CLI auth help:"
+                  $HOME/.dotnet/tools/pac auth --help
+                  exit 1
+                }
             }
+          
           echo "[SUCCESS] Authenticated successfully"
+          echo "[INFO] Current authentication context:"
+          $HOME/.dotnet/tools/pac auth whoami || true
 
       - name: Select Organization
         run: |
