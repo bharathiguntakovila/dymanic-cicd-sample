@@ -68,20 +68,19 @@ jobs:
           echo ""
 
       - name: Checkout branch
-        run: |
-          echo "[STEP] Checking out repository..."
-          git clone --depth 1 https://github.com/${{ github.repository }} .
-          git fetch origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-          echo "[SUCCESS] Repository checked out"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Display File Structure Before
+      - name: Display Checkout Info
         run: |
-          echo "[INFO] Current directory structure:"
+          echo "[STEP] Repository checked out successfully"
+          echo "[INFO] Current directory:"
           pwd
-          ls -la
-          echo "[INFO] Git status:"
+          echo "[INFO] Git repository information:"
           git status
+          echo "[INFO] Current branch:"
+          git branch -vv
 
       - name: Install Power Platform Tools
         run: |
