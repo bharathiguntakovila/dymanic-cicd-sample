@@ -24,14 +24,6 @@ env:
   # Artifact Configuration
   ARTIFACT_NAME: power-platform-solutions
   ARTIFACT_RETENTION_DAYS: "30"
-  
-  # Action Versions
-  CHECKOUT_VERSION: v4
-  UPLOAD_ARTIFACT_VERSION: v3
-  POWERPLATFORM_SETUP_VERSION: v1
-  POWERPLATFORM_AUTH_VERSION: v1
-  POWERPLATFORM_EXPORT_VERSION: v1
-  POWERPLATFORM_UNPACK_VERSION: v1
 
 jobs:
   export-extract:
@@ -39,25 +31,19 @@ jobs:
     permissions:
       contents: write
     
-    # ========================================================================
-    # JOB ENVIRONMENT VARIABLES - Derived from inputs and global variables
-    # ========================================================================
-    env:
-      MANAGED_FILE: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip
-      UNMANAGED_FILE: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip
-      SOLUTION_FOLDER: ${{ env.SOLUTIONS_DIR }}/${{ env.SOLUTION_NAME }}
+
       
     steps:
       - name: Checkout branch
-        uses: actions/checkout@${{ env.CHECKOUT_VERSION }}
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Power Platform CLI
-        uses: microsoft/powerplatform-actions/setup@${{ env.POWERPLATFORM_SETUP_VERSION }}
+        uses: microsoft/powerplatform-actions/setup@v1
 
       - name: Authenticate Power Platform
-        uses: microsoft/powerplatform-actions/authenticate@${{ env.POWERPLATFORM_AUTH_VERSION }}
+        uses: microsoft/powerplatform-actions/authenticate@v1
         with:
           environment-url: ${{ env.ENVIRONMENT_URL }}
           tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
@@ -65,32 +51,32 @@ jobs:
           client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
 
       - name: Export solution as managed
-        uses: microsoft/powerplatform-actions/export-solution@${{ env.POWERPLATFORM_EXPORT_VERSION }}
+        uses: microsoft/powerplatform-actions/export-solution@v1
         with:
           environment-url: ${{ env.ENVIRONMENT_URL }}
           solution-name: ${{ env.SOLUTION_NAME }}
-          solution-output-file: ${{ env.MANAGED_FILE }}
+          solution-output-file: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip
           managed: true
           tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
           app-id: ${{ secrets.POWERPLATFORM_APP_ID }}
           client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
 
       - name: Export solution as unmanaged
-        uses: microsoft/powerplatform-actions/export-solution@${{ env.POWERPLATFORM_EXPORT_VERSION }}
+        uses: microsoft/powerplatform-actions/export-solution@v1
         with:
           environment-url: ${{ env.ENVIRONMENT_URL }}
           solution-name: ${{ env.SOLUTION_NAME }}
-          solution-output-file: ${{ env.UNMANAGED_FILE }}
+          solution-output-file: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip
           managed: false
           tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
           app-id: ${{ secrets.POWERPLATFORM_APP_ID }}
           client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
 
       - name: Unpack unmanaged solution
-        uses: microsoft/powerplatform-actions/unpack-solution@${{ env.POWERPLATFORM_UNPACK_VERSION }}
+        uses: microsoft/powerplatform-actions/unpack-solution@v1
         with:
-          solution-file: ${{ env.UNMANAGED_FILE }}
-          solution-folder: ${{ env.SOLUTION_FOLDER }}
+          solution-file: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip
+          solution-folder: ${{ env.SOLUTIONS_DIR }}/${{ env.SOLUTION_NAME }}
           solution-type: ${{ env.SOLUTION_TYPE }}
           overwrite-files: true
 
@@ -98,7 +84,7 @@ jobs:
         run: mkdir -p ${{ env.MANAGED_SOLUTIONS_DIR }}
 
       - name: Copy managed solution
-        run: cp ${{ env.MANAGED_FILE }} ${{ env.MANAGED_SOLUTIONS_DIR }}/
+        run: cp ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip ${{ env.MANAGED_SOLUTIONS_DIR }}/
 
       - name: Configure git
         run: |
@@ -121,7 +107,7 @@ jobs:
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@${{ env.UPLOAD_ARTIFACT_VERSION }}
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: |
