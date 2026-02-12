@@ -1,0 +1,68 @@
+# Build Artifacts
+build/
+dist/
+*.zip
+*.nupkg
+*.vsix
+
+# Power Platform
+export/
+src/.ref/
+solution-export*
+deployment-records/
+
+# Dependencies
+node_modules/
+*.egg-info/
+__pycache__/
+.Python
+
+# Development
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# IDE
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Testing
+coverage/
+htmlcov/
+.coverage
+
+# Cache
+.cache/
+.pytest_cache/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Build outputs
+out/
+bin/
+obj/
+
+# Application logs
+application.log
+error.log

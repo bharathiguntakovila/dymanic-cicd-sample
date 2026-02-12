@@ -1,0 +1,567 @@
+# ============================================================================
+# GITHUB ACTIONS WORKFLOW VARIABLES - CENTRALIZED CONFIGURATION
+# ============================================================================
+# This file contains all configurable variables used across workflows.
+# Update values here and they'll be used across all workflows.
+# 
+# HOW TO USE IN WORKFLOWS:
+# 1. Load this file using GitHub Script
+# 2. Parse YAML and extract needed values
+# 3. Export as environment variables or GitHub outputs
+# 
+# EXAMPLE IN WORKFLOW:
+#   - name: Load Variables
+#     uses: actions/github-script@v7
+#     with:
+#       script: |
+#         const yaml = require('js-yaml');
+#         const fs = require('fs');
+#         const vars = yaml.load(fs.readFileSync('...'));
+#         core.exportVariable('SOLUTION_NAME', vars.solution.name);
+
+# ============================================================================
+# SECTION 1: SOLUTION & PROJECT CONFIGURATION
+# ============================================================================
+solution:
+  # Main solution name (used in exports, deploys, and reports)
+  name: "Main Solution"
+  
+  # Publisher name (for solution publishing)
+  publisher: "Default"
+  
+  # Solution files naming
+  managed_solution_file: "solution_managed.zip"
+  unmanaged_solution_file: "solution.zip"
+  
+  # Solution checker configuration
+  solution_checker:
+    enabled: true
+    severity_level: "Medium"        # Low, Medium, High
+    fail_on_issues: false
+    timeout_minutes: 10
+  
+  # Component threshold limits for governance
+  component_limits:
+    max_canvas_apps: 50
+    max_model_driven_apps: 20
+    max_cloud_flows: 100
+    max_cloud_flow_runs_per_month: 10000
+    max_dataverse_tables: 100
+    max_plugins: 20
+    max_web_resources: 200
+    max_solution_size_mb: 95
+
+# ============================================================================
+# SECTION 2: ENVIRONMENT CONFIGURATION
+# ============================================================================
+environments:
+  # Development Environment
+  dev:
+    display_name: "Development"
+    type: "Sandbox"
+    branch: "feature/*"
+    auto_deploy: false
+    backup_enabled: false
+    health_check_enabled: true
+    # URL stored in GitHub Secret: ENVIRONMENT_URL_DEV
+  
+  # Test Environment
+  test:
+    display_name: "Test"
+    type: "Sandbox"
+    branch: "develop"
+    auto_deploy: true
+    backup_enabled: true
+    health_check_enabled: true
+    # URL stored in GitHub Secret: ENVIRONMENT_URL_TEST
+  
+  # Pre-Production Environment (Optional)
+  preprod:
+    display_name: "Pre-Production"
+    type: "Sandbox"
+    branch: "release/*"
+    auto_deploy: false
+    backup_enabled: true
+    health_check_enabled: true
+    # URL stored in GitHub Secret: ENVIRONMENT_URL_PREPROD
+    # Note: Optional - only enable if you use pre-prod environment
+  
+  # Production Environment
+  prod:
+    display_name: "Production"
+    type: "Production"
+    branch: "main"
+    auto_deploy: false
+    backup_enabled: true
+    health_check_enabled: true
+    requires_approval: true
+    approval_count: 2
+    # URL stored in GitHub Secret: ENVIRONMENT_URL_PROD
+
+# ============================================================================
+# SECTION 3: AUTHENTICATION & CREDENTIALS
+# ============================================================================
+authentication:
+  # All credentials stored in GitHub Secrets (not here!)
+  method: "ServicePrincipal"
+  
+  # Required GitHub Secrets (store these separately):
+  # - TENANT_ID: Azure Tenant ID
+  # - CLIENT_ID: Service Principal App ID
+  # - CLIENT_SECRET: Service Principal Secret/Certificate
+  # - ENVIRONMENT_URL_DEV: Development environment URL
+  # - ENVIRONMENT_URL_TEST: Test environment URL
+  # - ENVIRONMENT_URL_PREPROD: Pre-prod environment URL (optional)
+  # - ENVIRONMENT_URL_PROD: Production environment URL
+  
+  mfa_enabled: true
+  credentials_expiry_days: 365
+
+# ============================================================================
+# SECTION 4: VERSIONING & BUILD CONFIGURATION
+# ============================================================================
+versioning:
+  # Versioning strategy
+  strategy: "semantic"              # Options: semantic, date-based, run-number
+  
+  # Semantic version template: MAJOR.MINOR.PATCH
+  # MAJOR: Manual update for breaking changes
+  # MINOR: Manual update for new features
+  # PATCH: Auto-increments with run_number
+  semantic_template: "1.0.{run_number}"
+  
+  # Alternative templates (uncomment to use)
+  # date_template: "{YYYY}.{MM}.{DD}.{run_number}"
+  # run_number_template: "1.0.{run_number}"
+  
+  # Git tag configuration
+  tag_prefix: "v"                   # Tags will be: v1.0.1, v1.0.2, etc.
+  tag_pre_release: "null"           # Leave null for release, use "beta", "rc", etc. for pre-releases
+  
+  # Version bumping (update manually as needed)
+  current_major: 1
+  current_minor: 0
+  next_bump_type: "none"            # Set to "major" or "minor" before release to bump
+
+# ============================================================================
+# SECTION 5: ARTIFACT MANAGEMENT
+# ============================================================================
+artifacts:
+  # Solution export artifacts
+  solution_export:
+    name_pattern: "solution-export-{version}"
+    retention_days: 30
+    include_logs: true
+  
+  # PR validation check artifacts
+  pr_validation:
+    name_pattern: "pr-validation-{run_number}"
+    retention_days: 30
+    include_solution_checker_report: true
+    include_security_scan_report: true
+  
+  # Test deployment artifacts
+  test_deployment:
+    name_pattern: "solution-managed-{version}"
+    retention_days: 90
+    include_backup: true
+    include_deployment_log: true
+  
+  # Production deployment artifacts (audit trail)
+  production_deployment:
+    name_pattern: "prod-deployment-{version}"
+    retention_days: 365
+    include_backup: true
+    include_deployment_log: true
+    include_approval_chain: true
+  
+  # Reports and monitoring artifacts
+  reports:
+    retention_days: 90
+    include_health_check_reports: true
+    include_monitoring_reports: true
+    include_deployment_records: true
+
+# ============================================================================
+# SECTION 6: DEPLOYMENT CONFIGURATION
+# ============================================================================
+deployment:
+  # Deployment timeouts (in minutes)
+  timeouts:
+    export_solution: 10
+    pack_solution: 5
+    import_solution: 15
+    smoke_tests: 10
+    health_checks: 10
+    approval_wait: 10080              # 7 days in minutes
+  
+  # Pre-deployment backup settings
+  backup:
+    enabled: true
+    naming_pattern: "backup-{env}-{timestamp}"
+    retention_days: 30
+    three_phase_backup: true          # Phase 1: Current state, Phase 2: Pre-import, Phase 3: Post-import
+  
+  # Deployment verification
+  verification:
+    enabled: true
+    include_smoke_tests: true
+    include_health_checks: true
+    skip_tests_on_hotfix: false       # Can be overridden with workflow input
+  
+  # Rollback configuration
+  rollback:
+    enabled: true
+    auto_rollback_on_failure: false   # Manual rollback only
+    rto_minutes: 15                   # Recovery Time Objective
+    rpo_minutes: 5                    # Recovery Point Objective
+    create_post_mortem: true
+    incident_id_format: "INC-YYYYMMDD-HHMMSS"
+
+# ============================================================================
+# SECTION 7: BRANCH CONFIGURATION
+# ============================================================================
+branches:
+  # Branch naming convention pattern (regex)
+  naming_pattern: "^(feature|bugfix|hotfix|release|chore)/[a-z]+-[0-9]{3}/[A-Z]+-[0-9]+/[a-z0-9\\-]{3,50}$"
+  
+  # Branch naming examples for reference
+  naming_examples:
+    feature: "feature/crm-001/US-1234/customer-dashboard"
+    bugfix: "bugfix/hr-002/BUG-567/payroll-calculation"
+    hotfix: "hotfix/sales-001/INC-123/urgent-fix"
+    release: "release/ops-003/REL-001/v1.2.0-prep"
+    chore: "chore/fin-004/CHO-001/documentation-update"
+  
+  # Main branches (no PRs required)
+  main_branches:
+    - "main"
+    - "develop"
+  
+  # Branch protection rules (set in GitHub UI)
+  protection:
+    main:
+      require_pr_reviews: 2
+      require_status_checks: true
+      require_codeowners_review: true
+      dismiss_stale_reviews: true
+      require_branches_up_to_date: true
+    develop:
+      require_pr_reviews: 1
+      require_status_checks: true
+      require_codeowners_review: false
+      dismiss_stale_reviews: true
+    release:
+      require_pr_reviews: 1
+      require_status_checks: true
+
+# ============================================================================
+# SECTION 8: NOTIFICATION CONFIGURATION
+# ============================================================================
+notifications:
+  # Slack notifications
+  slack:
+    enabled: true
+    
+    # Webhook configuration (URLs stored in GitHub Secrets)
+    webhooks:
+      default: "SLACK_WEBHOOK"
+      critical: "SLACK_WEBHOOK_CRITICAL"
+      ops: "SLACK_WEBHOOK_OPS"
+    
+    # Event notification triggers
+    events:
+      pr_validation_complete:
+        enabled: true
+        webhook: "default"
+        
+      test_deployment_success:
+        enabled: true
+        webhook: "default"
+        
+      test_deployment_failure:
+        enabled: true
+        webhook: "critical"
+        
+      prod_deployment_start:
+        enabled: true
+        webhook: "critical"
+        
+      prod_deployment_success:
+        enabled: true
+        webhook: "critical"
+        
+      prod_deployment_failure:
+        enabled: true
+        webhook: "critical"
+        
+      rollback_initiated:
+        enabled: true
+        webhook: "critical"
+        
+      health_check_failed:
+        enabled: true
+        webhook: "critical"
+    
+    # Message formatting
+    include_workflow_url: true
+    include_commit_details: true
+    include_author_mention: true
+  
+  # GitHub notifications
+  github:
+    enabled: true
+    create_issues: true
+    create_releases: true
+    create_pr_comments: true
+    create_deployment_reviews: false
+
+# ============================================================================
+# SECTION 9: APPROVAL GATE CONFIGURATION
+# ============================================================================
+approvals:
+  # Production deployment approval gates
+  production:
+    # Security review gate
+    security:
+      enabled: true
+      environment_name: "production-security"
+      required_reviewers: 1
+      timeout_days: 7
+      auto_dismiss_old_reviews: true
+    
+    # Release manager approval gate
+    release:
+      enabled: true
+      environment_name: "production-release"
+      required_reviewers: 1
+      timeout_days: 7
+      auto_dismiss_old_reviews: true
+  
+  # Rollback approval gates
+  rollback:
+    enabled: true
+    environment_name: "rollback-approval"
+    required_reviewers: 1
+    timeout_days: 1
+  
+  # Approval concurrency
+  allow_concurrent_approvals: false
+  require_all_approvers_online: false
+
+# ============================================================================
+# SECTION 10: MONITORING & HEALTH CHECK CONFIGURATION
+# ============================================================================
+monitoring:
+  # Daily health check schedules (UTC)
+  health_check:
+    enabled: true
+    schedule_morning: "0 8 * * *"     # 8 AM UTC
+    schedule_evening: "0 20 * * *"    # 8 PM UTC
+    
+    # Environments to monitor
+    environments_monitored:
+      - "dev"
+      - "test"
+      - "preprod"
+      - "prod"
+    
+    # Health check thresholds
+    thresholds:
+      uptime_percentage: 99.0
+      response_time_ms: 2000
+      error_rate_percentage: 1.0
+      database_size_gb: 1000
+  
+  # Weekly maintenance schedule (UTC)
+  maintenance:
+    enabled: true
+    schedule: "0 2 * * 0"             # 2 AM Sunday UTC
+    
+    # Branch cleanup settings
+    branch_cleanup:
+      enabled: true
+      delete_merged_branches: true
+      delete_stale_days: 90
+    
+    # Artifact cleanup settings
+    artifact_cleanup:
+      enabled: true
+      delete_old_artifacts: true
+      cleanup_retention_override_days: 30
+  
+  # Monthly monitoring report schedule (UTC)
+  monitoring_report:
+    enabled: true
+    schedule: "0 6 1 * *"             # 6 AM on 1st of month UTC
+    
+    # Report sections to include
+    report_sections:
+      - "solution_size_analysis"
+      - "component_growth_trends"
+      - "performance_metrics"
+      - "dependency_analysis"
+      - "governance_compliance"
+      - "technical_debt_assessment"
+      - "usage_analytics"
+      - "cost_analysis"
+  
+  # Weekly provisioning schedule (UTC)
+  provisioning:
+    enabled: true
+    schedule: "0 3 * * 1"             # 3 AM Monday UTC
+    
+    # Check for updates
+    check_actions_updates: true
+    check_connector_updates: true
+    check_plugin_updates: true
+    check_flow_updates: true
+
+# ============================================================================
+# SECTION 11: SECURITY CONFIGURATION
+# ============================================================================
+security:
+  # Secret scanning (TruffleHog)
+  secret_scanning:
+    enabled: true
+    tool: "truffleHog"
+    severity_threshold: "HIGH"        # LOW, MEDIUM, HIGH
+    fail_on_secrets_found: true
+  
+  # Code quality and security checks
+  code_quality:
+    enabled: true
+    fail_on_violations: false
+  
+  # Credential management
+  credentials:
+    require_mfa: true
+    require_service_principal: true
+    validate_permissions: true
+    credentials_rotation_days: 90
+  
+  # Security policies
+  policies:
+    require_pr_reviews: true
+    require_codeowners_approval: true
+    block_direct_commits_to_main: true
+    block_direct_commits_to_develop: true
+    enforce_branch_protection: true
+
+# ============================================================================
+# SECTION 12: PR VALIDATION CONFIGURATION
+# ============================================================================
+pr_validation:
+  # Validation checks to perform
+  checks:
+    branch_naming: true
+    solution_checker: true
+    code_quality: true
+    security_scan: true
+    size_validation: true
+    component_validation: true
+  
+  # Solution Checker integration
+  solution_checker:
+    enabled: true
+    severity_level: "Medium"
+    fail_on_high_severity: false
+  
+  # Size validation thresholds
+  size_validation:
+    max_solution_size_mb: 95
+    warn_at_size_mb: 80
+    max_single_file_mb: 25
+    warn_at_file_size_mb: 20
+  
+  # PR comment generation
+  generate_comment: true
+  include_recommendations: true
+  include_solution_checker_report: true
+
+# ============================================================================
+# SECTION 13: ADVANCED CONFIGURATION
+# ============================================================================
+advanced:
+  # Concurrency settings to prevent simultaneous deployments
+  concurrency:
+    enabled: true
+    group_pattern: "deploy-{environment}"
+    cancel_in_progress: true
+  
+  # Retry settings for resilience
+  retry:
+    max_attempts: 2
+    wait_seconds: 10
+  
+  # Dry run mode (non-destructive testing)
+  dry_run:
+    enabled: false
+    skip_destructive_operations: true
+    skip_approvals: true
+  
+  # Performance optimization
+  optimization:
+    enable_parallel_jobs: true
+    enable_dependency_caching: true
+    use_matrix_builds: false
+  
+  # Debug mode for troubleshooting
+  debug_mode: false
+  verbose_logging: false
+
+# ============================================================================
+# SECTION 14: WORKFLOW-SPECIFIC OVERRIDES
+# ============================================================================
+# Define environment-specific or workflow-specific overrides here
+workflow_overrides:
+  pr_validation:
+    timeout_minutes: 30
+    max_parallel_jobs: 2
+  
+  test_deployment:
+    timeout_minutes: 45
+    skip_backup_on_error: false
+  
+  production_deployment:
+    timeout_minutes: 60
+    require_approval: true
+  
+  rollback:
+    timeout_minutes: 30
+    auto_create_incident: true
+  
+  health_check:
+    timeout_minutes: 20
+    include_performance_metrics: true
+
+# ============================================================================
+# SECTION 15: NEXUS ARTIFACT REPOSITORY
+# ============================================================================
+nexus:
+  enabled: false
+  server_url: "${{ secrets.NEXUS_URL }}"
+  repository:
+    name: "powerplatform-artifacts"
+    base_path: "com/company/powerplatform/main-solution"
+  credentials:
+    username_secret: "NEXUS_USERNAME"
+    password_secret: "NEXUS_PASSWORD"
+  upload:
+    test:
+      enabled: true
+      retention_days: 90
+      on_failure: "continue"
+    production:
+      enabled: true
+      retention_days: 365
+      on_failure: "continue"
+  download:
+    enabled: true
+    primary_source: "github"
+    fallback_source: "nexus"
+    timeout_seconds: 300
+
+# ============================================================================
+# SECTION 15: CHANGELOG & VERSION HISTORY
+# ============================================================================

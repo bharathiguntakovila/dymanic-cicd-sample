@@ -1,0 +1,244 @@
+<mxfile host="app.diagrams.net" modified="2026-02-12T00:00:00.000Z" agent="5.0" version="24.0.0" type="device">
+  <diagram id="branching-strategies" name="Branching Strategies">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="THREE BEST BRANCHING STRATEGIES FOR 300+ TEAMS" style="text;html=1;strokeColor=none;fillColor=none;fontSize=24;fontStyle=1;verticalAlign=top;align=center;" vertex="1" parent="1">
+          <mxGeometry x="0" y="10" width="1400" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- STRATEGY 1: GIT FLOW (LEFT COLUMN) -->
+        <mxCell id="s1-title" value="STRATEGY 1: GIT FLOW" style="text;html=1;strokeColor=#1976D2;fillColor=#E3F2FD;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="20" y="70" width="420" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Main branch -->
+        <mxCell id="s1-main" value="main (Production)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#2E7D32;fillColor=#C8E6C9;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="125" width="360" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Release branch -->
+        <mxCell id="s1-release" value="release/* (Pre-Production)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#E65100;fillColor=#FFE0B2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="185" width="360" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Develop branch -->
+        <mxCell id="s1-develop" value="develop (Test Integration)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#1565C0;fillColor=#BBDEFB;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="245" width="360" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Feature branches -->
+        <mxCell id="s1-feat1" value="feature/crm/US-1234/dashboard" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="50" y="310" width="170" height="25" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="s1-feat2" value="feature/hr/US-5678/payroll" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="240" y="310" width="170" height="25" as="geometry"/>
+        </mxCell>
+        
+        <!-- Bugfix branches -->
+        <mxCell id="s1-bug" value="bugfix/sales/BUG-890/discount" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#AD1457;fillColor=#FCE4EC;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="50" y="355" width="170" height="25" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrows -->
+        <mxCell id="s1-a1" value="" style="endArrow=open;strokeColor=#666;strokeWidth=2;html=1;" edge="1" parent="1" source="s1-main" target="s1-release"/>
+        <mxCell id="s1-a2" value="" style="endArrow=open;strokeColor=#666;strokeWidth=2;html=1;" edge="1" parent="1" source="s1-release" target="s1-develop"/>
+        <mxCell id="s1-a3" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s1-feat1" target="s1-develop"/>
+        <mxCell id="s1-a4" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s1-feat2" target="s1-develop"/>
+        <mxCell id="s1-a5" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s1-bug" target="s1-develop"/>
+        
+        <!-- Description -->
+        <mxCell id="s1-desc" value="✓ BEST FOR: Multiple projects &amp; teams&#10;✓ Clear workflow with feature isolation&#10;✓ Supports parallel development&#10;✓ IDEAL: 300+ members" style="text;html=1;whiteSpace=wrap;strokeColor=none;fontSize=9;align=left;" vertex="1" parent="1">
+          <mxGeometry x="50" y="400" width="360" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- STRATEGY 2: TRUNK-BASED (MIDDLE COLUMN) -->
+        <mxCell id="s2-title" value="STRATEGY 2: TRUNK-BASED" style="text;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="490" y="70" width="420" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Main trunk -->
+        <mxCell id="s2-main" value="main (Always Deployable)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#2E7D32;fillColor=#C8E6C9;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="125" width="360" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Feature branches -->
+        <mxCell id="s2-feat1" value="feat-dashboard (1-2 days)" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="520" y="200" width="170" height="25" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="s2-feat2" value="feat-payroll (1-2 days)" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="710" y="200" width="170" height="25" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="s2-feat3" value="feat-discount (1-2 days)" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="520" y="245" width="170" height="25" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="s2-feat4" value="feat-audit (1-2 days)" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="710" y="245" width="170" height="25" as="geometry"/>
+        </mxCell>
+        
+        <!-- Feature Flags -->
+        <mxCell id="s2-flags" value="Feature Flags for Control" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#E65100;fillColor=#FFE0B2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="310" width="360" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrows -->
+        <mxCell id="s2-a1" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s2-feat1" target="s2-main"/>
+        <mxCell id="s2-a2" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s2-feat2" target="s2-main"/>
+        <mxCell id="s2-a3" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s2-feat3" target="s2-main"/>
+        <mxCell id="s2-a4" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s2-feat4" target="s2-main"/>
+        <mxCell id="s2-a5" value="" style="endArrow=open;strokeColor=#666;strokeWidth=2;html=1;" edge="1" parent="1" source="s2-main" target="s2-flags"/>
+        
+        <!-- Description -->
+        <mxCell id="s2-desc" value="✓ BEST FOR: Fast-moving teams&#10;✓ Less merge conflicts&#10;✓ Quick daily deployments&#10;✓ Requires feature flags" style="text;html=1;whiteSpace=wrap;strokeColor=none;fontSize=9;align=left;" vertex="1" parent="1">
+          <mxGeometry x="520" y="375" width="360" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- STRATEGY 3: RELEASE BRANCH (RIGHT COLUMN) -->
+        <mxCell id="s3-title" value="STRATEGY 3: RELEASE BRANCH" style="text;html=1;strokeColor=#01579B;fillColor=#E1F5FE;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="960" y="70" width="420" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Main production -->
+        <mxCell id="s3-main" value="main (v2.1.0)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#2E7D32;fillColor=#C8E6C9;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="125" width="360" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Release branches -->
+        <mxCell id="s3-release1" value="release/v2.2.0 (In Progress)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#D84315;fillColor=#FFCCBC;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="200" width="360" height="35" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="s3-release2" value="release/v2.1.1 (Hotfix)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#D84315;fillColor=#FFCCBC;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="265" width="360" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Develop -->
+        <mxCell id="s3-develop" value="develop (Next Release 2.3.0)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#1565C0;fillColor=#BBDEFB;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="330" width="360" height="35" as="geometry"/>
+        </mxCell>
+        
+        <!-- Features -->
+        <mxCell id="s3-feat1" value="feature/new-dashboard" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="390" width="170" height="25" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="s3-feat2" value="feature/analytics" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="390" width="170" height="25" as="geometry"/>
+        </mxCell>
+        
+        <!-- Arrows -->
+        <mxCell id="s3-a1" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;dashed=1;html=1;" edge="1" parent="1" source="s3-release1" target="s3-main"/>
+        <mxCell id="s3-a2" value="" style="endArrow=open;strokeColor=#D32F2F;strokeWidth=2;dashed=1;html=1;" edge="1" parent="1" source="s3-release2" target="s3-main"/>
+        <mxCell id="s3-a3" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s3-develop" target="s3-release1"/>
+        <mxCell id="s3-a4" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s3-feat1" target="s3-develop"/>
+        <mxCell id="s3-a5" value="" style="endArrow=open;strokeColor=#666;strokeWidth=1.5;html=1;" edge="1" parent="1" source="s3-feat2" target="s3-develop"/>
+        
+        <!-- Description -->
+        <mxCell id="s3-desc" value="✓ BEST FOR: Scheduled releases&#10;✓ Multiple versions in production&#10;✓ Complex version management&#10;✓ Enterprise deployments" style="text;html=1;whiteSpace=wrap;strokeColor=none;fontSize=9;align=left;" vertex="1" parent="1">
+          <mxGeometry x="990" y="440" width="360" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- COMPARISON TABLE -->
+        <mxCell id="table-title" value="COMPARISON &amp; RECOMMENDATION" style="text;html=1;strokeColor=#F57F17;fillColor=#FFF9C4;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="530" width="1320" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Table headers -->
+        <mxCell id="h1" value="Criteria" style="text;html=1;strokeColor=#455A64;fillColor=#ECEFF1;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="575" width="180" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="h2" value="Git Flow" style="text;html=1;strokeColor=#2E7D32;fillColor=#E8F5E9;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="230" y="575" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="h3" value="Trunk-Based" style="text;html=1;strokeColor=#6A1B9A;fillColor=#F3E5F5;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="440" y="575" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="h4" value="Release Branch" style="text;html=1;strokeColor=#01579B;fillColor=#E1F5FE;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="650" y="575" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="h5" value="RECOMMENDATION" style="text;html=1;strokeColor=#E65100;fillColor=#FFF3E0;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="860" y="575" width="500" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Row 1: Team Size -->
+        <mxCell id="r1-label" value="Team Size" style="text;html=1;strokeColor=#455A64;fillColor=#ECEFF1;fontSize=9;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="615" width="180" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r1-c1" value="20-100+" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="230" y="615" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r1-c2" value="50+ (Fast Teams)" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="440" y="615" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r1-c3" value="100+ (Enterprise)" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="650" y="615" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r1-rec" value="✓ GIT FLOW (300+ Teams)" style="text;html=1;strokeColor=#2E7D32;fillColor=#C8E6C9;fontSize=9;align=center;verticalAlign=middle;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="615" width="500" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Row 2: Complexity -->
+        <mxCell id="r2-label" value="Learning Curve" style="text;html=1;strokeColor=#455A64;fillColor=#ECEFF1;fontSize=9;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="655" width="180" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r2-c1" value="Moderate" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="230" y="655" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r2-c2" value="Simple" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="440" y="655" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r2-c3" value="Complex" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="650" y="655" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r2-rec" value="Well-balanced complexity" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="860" y="655" width="500" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Row 3: Release Frequency -->
+        <mxCell id="r3-label" value="Release Freq" style="text;html=1;strokeColor=#455A64;fillColor=#ECEFF1;fontSize=9;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="695" width="180" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r3-c1" value="Weekly/Bi-weekly" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="230" y="695" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r3-c2" value="Daily" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="440" y="695" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r3-c3" value="Sprint-based" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="650" y="695" width="200" height="30" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="r3-rec" value="Perfect for 1-2 week sprints" style="text;html=1;strokeColor=#DDD;fontSize=9;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="860" y="695" width="500" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Final Recommendation -->
+        <mxCell id="final-rec" value="🎯 LEADERSHIP DECISION: Git Flow strategy provides clear governance, isolates work by project/feature, supports parallel development of 300+ team members, and scales predictably across multiple projects." style="text;html=1;whiteSpace=wrap;strokeColor=#2E7D32;fillColor=#E8F5E9;fontSize=11;align=center;verticalAlign=middle;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="755" width="1320" height="55" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

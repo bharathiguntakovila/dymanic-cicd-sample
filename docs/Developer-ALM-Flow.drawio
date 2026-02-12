@@ -1,0 +1,322 @@
+<mxfile host="Electron" modified="2026-02-12T00:00:00.000Z" agent="5.0" etag="1" version="24.1.0" type="device">
+  <diagram id="dev-alm-flow" name="Developer ALM Workflow Flow">
+    <mxGraphModel dx="1200" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="2000" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- TITLE -->
+        <mxCell id="title" value="Developer ALM Workflow: Change to Production Deployment" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=18;fontStyle=1;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="200" y="15" width="810" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- PHASE 1 HEADER -->
+        <mxCell id="ph1-hdr" value="PHASE 1: LOCAL DEVELOPMENT" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=#edf2f7;fontSize=11;fontStyle=1;fontColor=#667eea;rounded=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="350" y="60" width="500" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Step 1 -->
+        <mxCell id="s1" value="Developer opens&#10;Power Apps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf2f7;strokeColor=#667eea;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="110" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#667eea;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="160" as="sourcePoint" />
+            <mxPoint x="600" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Step 2 -->
+        <mxCell id="s2" value="Make changes to solution&#10;(Forms, Flows, Apps)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf2f7;strokeColor=#667eea;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="190" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#667eea;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="240" as="sourcePoint" />
+            <mxPoint x="600" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Step 3 -->
+        <mxCell id="s3" value="Changes auto-synced to Git&#10;(Git Integration enabled)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5f4e6;strokeColor=#27ae60;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="270" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#667eea;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="320" as="sourcePoint" />
+            <mxPoint x="600" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Step 4 -->
+        <mxCell id="s4" value="Developer pushes to GitHub&#10;git push origin feature/..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#f39c12;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="350" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#f39c12;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="sourcePoint" />
+            <mxPoint x="600" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- PHASE 2 HEADER -->
+        <mxCell id="ph2-hdr" value="PHASE 2: CODE REVIEW &amp; VALIDATION" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=#fef5e7;fontSize=11;fontStyle=1;fontColor=#f39c12;rounded=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="350" y="425" width="500" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Step 5 -->
+        <mxCell id="s5" value="Create Pull Request (PR)&#10;to develop branch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#f39c12;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="470" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#f39c12;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="520" as="sourcePoint" />
+            <mxPoint x="600" y="550" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Step 6 -->
+        <mxCell id="s6" value="GitHub Actions runs:&#10;• Export solution&#10;• Solution Checker&#10;• Run unit tests" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d6eaf8;strokeColor=#3498db;strokeWidth=2;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="550" width="500" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#3498db;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="620" as="sourcePoint" />
+            <mxPoint x="600" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Decision 1 -->
+        <mxCell id="d1" value="Tests&#10;Pass?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f4d03f;strokeColor=#f39c12;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="650" width="160" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- NO path -->
+        <mxCell id="a6-no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#e74c3c;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520" y="690" as="sourcePoint" />
+            <mxPoint x="300" y="690" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lab-no1" value="NO" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#e74c3c;" vertex="1" connectable="0" parent="a6-no">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Fail box -->
+        <mxCell id="fail1" value="Fix issues and&#10;push again" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fadbd8;strokeColor=#e74c3c;strokeWidth=2;fontSize=10;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="150" y="660" width="170" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Loop back -->
+        <mxCell id="loop1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#e74c3c;strokeWidth=2;dashed=1;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="630" as="sourcePoint" />
+            <mxPoint x="220" y="470" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="100" y="630" />
+              <mxPoint x="100" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- YES path -->
+        <mxCell id="a6-yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#27ae60;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="730" as="sourcePoint" />
+            <mxPoint x="600" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lab-yes1" value="YES" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#27ae60;" vertex="1" connectable="0" parent="a6-yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Step 7 -->
+        <mxCell id="s7" value="Team Lead reviews PR&#10;Checks code quality" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#f39c12;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="760" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#f39c12;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="810" as="sourcePoint" />
+            <mxPoint x="600" y="840" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Step 8 -->
+        <mxCell id="s8" value="Approve &amp; Merge&#10;PR to develop" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5f4e6;strokeColor=#27ae60;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="840" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#27ae60;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="890" as="sourcePoint" />
+            <mxPoint x="600" y="920" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- PHASE 3 HEADER -->
+        <mxCell id="ph3-hdr" value="PHASE 3: AUTO DEPLOY TO TEST" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=#d6eaf8;fontSize=11;fontStyle=1;fontColor=#3498db;rounded=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="350" y="915" width="500" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Step 9 -->
+        <mxCell id="s9" value="GitHub Actions triggered:&#10;• Pack solution&#10;• Create managed build&#10;• Import to Test env" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d6eaf8;strokeColor=#3498db;strokeWidth=2;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="955" width="500" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#3498db;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1025" as="sourcePoint" />
+            <mxPoint x="600" y="1055" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Step 10 -->
+        <mxCell id="s10" value="QA &amp; Business test&#10;in Test Environment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d6eaf8;strokeColor=#3498db;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1055" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#3498db;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1105" as="sourcePoint" />
+            <mxPoint x="600" y="1135" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Decision 2 -->
+        <mxCell id="d2" value="UAT&#10;Approved?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f4d03f;strokeColor=#f39c12;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="1135" width="160" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- NO path 2 -->
+        <mxCell id="a10-no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#e74c3c;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520" y="1175" as="sourcePoint" />
+            <mxPoint x="300" y="1175" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lab-no2" value="NO" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#e74c3c;" vertex="1" connectable="0" parent="a10-no">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Fail box 2 -->
+        <mxCell id="fail2" value="Create bugfix&#10;Repeat cycle" style="rounded=1;whiteSpace=wrap;html=1;fillColor:#fadbd8;strokeColor=#e74c3c;strokeWidth=2;fontSize=10;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="140" y="1145" width="190" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- YES path 2 -->
+        <mxCell id="a10-yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#27ae60;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1215" as="sourcePoint" />
+            <mxPoint x="600" y="1245" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lab-yes2" value="YES" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#27ae60;" vertex="1" connectable="0" parent="a10-yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- PHASE 4 HEADER -->
+        <mxCell id="ph4-hdr" value="PHASE 4: RELEASE TO PRODUCTION" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=#fadbd8;fontSize=11;fontStyle=1;fontColor=#e74c3c;rounded=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1240" width="500" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Step 11 -->
+        <mxCell id="s11" value="Create Release PR&#10;develop → main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fadbd8;strokeColor=#e74c3c;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1280" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#e74c3c;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1330" as="sourcePoint" />
+            <mxPoint x="600" y="1360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Step 12 -->
+        <mxCell id="s12" value="Release Lead approves&#10;(2-person approval)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fadbd8;strokeColor=#e74c3c;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1360" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#e74c3c;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1410" as="sourcePoint" />
+            <mxPoint x="600" y="1440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Step 13 -->
+        <mxCell id="s13" value="Merge &amp; Tag Release&#10;(v1.2.0)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fadbd8;strokeColor=#e74c3c;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1440" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#e74c3c;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1490" as="sourcePoint" />
+            <mxPoint x="600" y="1520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Step 14 -->
+        <mxCell id="s14" value="GitHub Actions:&#10;• Full backup of Prod&#10;• Import managed solution&#10;• Run smoke tests" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fadbd8;strokeColor=#e74c3c;strokeWidth=2;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1520" width="500" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#e74c3c;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1590" as="sourcePoint" />
+            <mxPoint x="600" y="1620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- SUCCESS -->
+        <mxCell id="s15" value="🟢 DEPLOYED TO PRODUCTION" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5f4e6;strokeColor=#27ae60;strokeWidth=3;fontSize=12;fontStyle=1;fontColor=#27ae60;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1620" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- ROLLBACK SECTION -->
+        <mxCell id="rb-hdr" value="OPTIONAL: ROLLBACK (if issues detected)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=#fceee6;fontSize=11;fontStyle=1;fontColor=#d35400;rounded=1;arcSize=3;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1690" width="500" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Rollback Step 1 -->
+        <mxCell id="rb1" value="Issue detected in Production" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f4d03f;strokeColor=#f39c12;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1730" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a-rb1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#f39c12;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1780" as="sourcePoint" />
+            <mxPoint x="600" y="1810" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Rollback Step 2 -->
+        <mxCell id="rb2" value="Checkout previous Git tag&#10;Redeploy to Production" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f4d03f;strokeColor=#f39c12;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1810" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="a-rb2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=8;html=1;strokeColor=#f39c12;strokeWidth=2;endArrow=classic;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1860" as="sourcePoint" />
+            <mxPoint x="600" y="1890" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Rollback Complete -->
+        <mxCell id="rb-done" value="🔄 ROLLBACK COMPLETE (RTO: 15 min)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8daef;strokeColor=#8e44ad;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#8e44ad;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1890" width="500" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

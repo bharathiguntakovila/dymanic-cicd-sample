@@ -1,0 +1,30 @@
+# Power Platform CI/CD Configuration Code Owners
+
+# Workflows - All changes require DevOps team review
+/.github/workflows/ @devops-team @platform-architects
+
+# Documentation & Architecture
+/docs/ @platform-architects @tech-leads
+
+# Solution files - Changes require solution owner review
+/src/ @solution-owner @development-team
+/build/ @devops-team @qa-team
+
+# Configuration files - Require admin review
+/.github/ @devops-team
+/renovate.json @devops-team
+*.yml @devops-team
+*.yaml @devops-team
+
+# Security & Access Control
+# Require explicit approval for credential or security-related changes
+**/secrets* @security-team @devops-team
+**/security* @security-team
+**/credentials* @security-team @devops-team
+
+# Release & Versioning
+CHANGELOG.md @release-manager @platform-architects
+VERSION @devops-team @release-manager
+
+# Default - Project maintainers
+* @project-maintainers
