@@ -39,16 +39,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Power Platform CLI
-        uses: microsoft/powerplatform-actions/setup@v1
+      - name: Install Power Platform Tools
+        uses: microsoft/powerplatform-actions/actions-install@v1
 
       - name: Authenticate Power Platform
         uses: microsoft/powerplatform-actions/authenticate@v1
         with:
           environment-url: ${{ env.ENVIRONMENT_URL }}
-          tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
           app-id: ${{ secrets.POWERPLATFORM_APP_ID }}
           client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
+          tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
 
       - name: Export solution as managed
         uses: microsoft/powerplatform-actions/export-solution@v1
@@ -57,9 +57,6 @@ jobs:
           solution-name: ${{ env.SOLUTION_NAME }}
           solution-output-file: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip
           managed: true
-          tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
-          app-id: ${{ secrets.POWERPLATFORM_APP_ID }}
-          client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
 
       - name: Export solution as unmanaged
         uses: microsoft/powerplatform-actions/export-solution@v1
@@ -68,9 +65,6 @@ jobs:
           solution-name: ${{ env.SOLUTION_NAME }}
           solution-output-file: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip
           managed: false
-          tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
-          app-id: ${{ secrets.POWERPLATFORM_APP_ID }}
-          client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
 
       - name: Unpack unmanaged solution
         uses: microsoft/powerplatform-actions/unpack-solution@v1
