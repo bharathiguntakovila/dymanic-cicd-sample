@@ -31,63 +31,200 @@ jobs:
     permissions:
       contents: write
     
-
-      
     steps:
+      # ======================================================================
+      # DEBUG: Display all variables and environment
+      # ======================================================================
+      - name: Display All Environment Variables
+        run: |
+          echo "=========================================="
+          echo "WORKFLOW VARIABLES AND CONFIGURATION"
+          echo "=========================================="
+          echo "Power Platform Configuration:"
+          echo "  - ENVIRONMENT_URL: ${{ env.ENVIRONMENT_URL }}"
+          echo "  - SOLUTION_NAME: ${{ env.SOLUTION_NAME }}"
+          echo "  - SOLUTION_VERSION: ${{ env.SOLUTION_VERSION }}"
+          echo ""
+          echo "Git Configuration:"
+          echo "  - GIT_USER_NAME: ${{ env.GIT_USER_NAME }}"
+          echo "  - GIT_USER_EMAIL: ${{ env.GIT_USER_EMAIL }}"
+          echo ""
+          echo "Directory Configuration:"
+          echo "  - SOLUTIONS_DIR: ${{ env.SOLUTIONS_DIR }}"
+          echo "  - MANAGED_SOLUTIONS_DIR: ${{ env.MANAGED_SOLUTIONS_DIR }}"
+          echo "  - SOLUTION_TYPE: ${{ env.SOLUTION_TYPE }}"
+          echo ""
+          echo "Artifact Configuration:"
+          echo "  - ARTIFACT_NAME: ${{ env.ARTIFACT_NAME }}"
+          echo "  - ARTIFACT_RETENTION_DAYS: ${{ env.ARTIFACT_RETENTION_DAYS }}"
+          echo ""
+          echo "Runner Information:"
+          echo "  - Runner Temp: ${{ runner.temp }}"
+          echo "  - Runner OS: ${{ runner.os }}"
+          echo "  - GitHub Actor: ${{ github.actor }}"
+          echo "  - GitHub Repository: ${{ github.repository }}"
+          echo "  - GitHub Branch: ${{ github.ref }}"
+          echo "=========================================="
+          echo ""
+
       - name: Checkout branch
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        run: |
+          echo "[STEP] Checking out repository..."
+          git clone --depth 1 https://github.com/${{ github.repository }} .
+          git fetch origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+          echo "[SUCCESS] Repository checked out"
+
+      - name: Display File Structure Before
+        run: |
+          echo "[INFO] Current directory structure:"
+          pwd
+          ls -la
+          echo "[INFO] Git status:"
+          git status
 
       - name: Install Power Platform Tools
-        uses: microsoft/powerplatform-actions/actions-install@v1
-
-      - name: Authenticate Power Platform
-        uses: microsoft/powerplatform-actions/authenticate@v1
-        with:
-          environment-url: ${{ env.ENVIRONMENT_URL }}
-          app-id: ${{ secrets.POWERPLATFORM_APP_ID }}
-          client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
-          tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
-
-      - name: Export solution as managed
-        uses: microsoft/powerplatform-actions/export-solution@v1
-        with:
-          environment-url: ${{ env.ENVIRONMENT_URL }}
-          solution-name: ${{ env.SOLUTION_NAME }}
-          solution-output-file: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip
-          managed: true
-
-      - name: Export solution as unmanaged
-        uses: microsoft/powerplatform-actions/export-solution@v1
-        with:
-          environment-url: ${{ env.ENVIRONMENT_URL }}
-          solution-name: ${{ env.SOLUTION_NAME }}
-          solution-output-file: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip
-          managed: false
-
-      - name: Unpack unmanaged solution
-        uses: microsoft/powerplatform-actions/unpack-solution@v1
-        with:
-          solution-file: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip
-          solution-folder: ${{ env.SOLUTIONS_DIR }}/${{ env.SOLUTION_NAME }}
-          solution-type: ${{ env.SOLUTION_TYPE }}
-          overwrite-files: true
-
-      - name: Create solutions directory for managed
-        run: mkdir -p ${{ env.MANAGED_SOLUTIONS_DIR }}
-
-      - name: Copy managed solution
-        run: cp ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip ${{ env.MANAGED_SOLUTIONS_DIR }}/
-
-      - name: Configure git
         run: |
+          echo "[STEP] Installing Power Platform Tools and PAC CLI..."
+          npm install -g @microsoft/powerplatform-cli
+          pac --version
+          echo "[SUCCESS] Power Platform Tools installed"
+          echo "[INFO] Checking pac command location:"
+          which pac
+
+      - name: Display PAC CLI Info
+        run: |
+          echo "[INFO] PAC CLI Version:"
+          pac --version
+          echo ""
+          echo "[INFO] PAC CLI Help:"
+          pac auth --help || true
+
+      - name: Authenticate to Power Platform
+        run: |
+          echo "[STEP] Authenticating to Power Platform environment..."
+          echo "[INFO] Environment URL: ${{ env.ENVIRONMENT_URL }}"
+          echo "[INFO] Using app-id: ${{ secrets.POWERPLATFORM_APP_ID }}"
+          echo "[INFO] Using tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}"
+          
+          pac auth create \
+            --url "${{ env.ENVIRONMENT_URL }}" \
+            --username "${{ secrets.POWERPLATFORM_APP_ID }}" \
+            --password "${{ secrets.POWERPLATFORM_CLIENT_SECRET }}" \
+            --tenant "${{ secrets.POWERPLATFORM_TENANT_ID }}" || {
+              echo "[ERROR] Authentication failed"
+              exit 1
+            }
+          echo "[SUCCESS] Authenticated successfully"
+
+      - name: Select Organization
+        run: |
+          echo "[STEP] Selecting organization..."
+          pac org select --url "${{ env.ENVIRONMENT_URL }}"
+          echo "[SUCCESS] Organization selected"
+
+      - name: Export Solution as Managed
+        run: |
+          echo "[STEP] Exporting solution as managed..."
+          echo "[INFO] Solution Name: ${{ env.SOLUTION_NAME }}"
+          echo "[INFO] Output File: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip"
+          
+          pac solution export \
+            --name "${{ env.SOLUTION_NAME }}" \
+            --path "${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip" \
+            --managed \
+            --force || {
+              echo "[ERROR] Failed to export managed solution"
+              exit 1
+            }
+          
+          echo "[SUCCESS] Managed solution exported"
+          echo "[INFO] File size:"
+          ls -lh "${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip"
+
+      - name: Export Solution as Unmanaged
+        run: |
+          echo "[STEP] Exporting solution as unmanaged..."
+          echo "[INFO] Solution Name: ${{ env.SOLUTION_NAME }}"
+          echo "[INFO] Output File: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip"
+          
+          pac solution export \
+            --name "${{ env.SOLUTION_NAME }}" \
+            --path "${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip" \
+            --force || {
+              echo "[ERROR] Failed to export unmanaged solution"
+              exit 1
+            }
+          
+          echo "[SUCCESS] Unmanaged solution exported"
+          echo "[INFO] File size:"
+          ls -lh "${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip"
+
+      - name: Unpack Unmanaged Solution
+        run: |
+          echo "[STEP] Unpacking unmanaged solution..."
+          echo "[INFO] Solution File: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip"
+          echo "[INFO] Output Folder: ${{ env.SOLUTIONS_DIR }}/${{ env.SOLUTION_NAME }}"
+          echo "[INFO] Solution Type: ${{ env.SOLUTION_TYPE }}"
+          
+          pac solution unpack \
+            --zipfile "${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip" \
+            --outputfolder "${{ env.SOLUTIONS_DIR }}/${{ env.SOLUTION_NAME }}" \
+            --type ${{ env.SOLUTION_TYPE }} || {
+              echo "[ERROR] Failed to unpack solution"
+              exit 1
+            }
+          
+          echo "[SUCCESS] Solution unpacked successfully"
+          echo "[INFO] Extracted files:"
+          find "${{ env.SOLUTIONS_DIR }}/${{ env.SOLUTION_NAME }}" -type f | head -20
+
+      - name: Create Managed Solutions Directory
+        run: |
+          echo "[STEP] Creating managed solutions directory..."
+          mkdir -p "${{ env.MANAGED_SOLUTIONS_DIR }}"
+          echo "[SUCCESS] Directory created: ${{ env.MANAGED_SOLUTIONS_DIR }}"
+
+      - name: Copy Managed Solution
+        run: |
+          echo "[STEP] Copying managed solution..."
+          cp "${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip" "${{ env.MANAGED_SOLUTIONS_DIR }}/"
+          echo "[SUCCESS] Managed solution copied"
+          echo "[INFO] File details:"
+          ls -lh "${{ env.MANAGED_SOLUTIONS_DIR }}/${{ env.SOLUTION_NAME }}_managed.zip"
+
+      - name: Display Directory Structure
+        run: |
+          echo "[INFO] Directory structure after export:"
+          echo ""
+          echo "Solutions Directory Structure:"
+          find "${{ env.SOLUTIONS_DIR }}" -type f 2>/dev/null | head -20 || echo "  (No files yet)"
+          echo ""
+          echo "Managed Solutions Directory Structure:"
+          ls -lh "${{ env.MANAGED_SOLUTIONS_DIR }}" || echo "  (Empty)"
+
+      - name: Configure Git
+        run: |
+          echo "[STEP] Configuring git..."
           git config --global user.name "${{ env.GIT_USER_NAME }}"
           git config --global user.email "${{ env.GIT_USER_EMAIL }}"
+          echo "[SUCCESS] Git configured"
+          echo "[INFO] Git config:"
+          git config --list | grep user
 
-      - name: Commit and push changes
+      - name: Commit and Push Changes
         run: |
-          git add ${{ env.SOLUTIONS_DIR }}/ ${{ env.MANAGED_SOLUTIONS_DIR }}/
+          echo "[STEP] Committing and pushing changes..."
+          echo "[INFO] Git status before commit:"
+          git status
+          
+          git add "${{ env.SOLUTIONS_DIR }}/" "${{ env.MANAGED_SOLUTIONS_DIR }}/" || echo "[INFO] No files to add"
+          
+          echo "[INFO] Changes staged:"
+          git status
+          
+          git diff --cached --stat || echo "[INFO] No changes to show"
+          
           git commit -m "feat: Export and extract ${{ env.SOLUTION_NAME }} solution
           
           - Exported managed solution to ${{ env.MANAGED_SOLUTIONS_DIR }}/
@@ -96,8 +233,24 @@ jobs:
           - Solution: ${{ env.SOLUTION_NAME }}
           - Version: ${{ env.SOLUTION_VERSION }}
           
-          Triggered by: ${{ github.actor }}" || echo "No changes to commit"
-          git push origin HEAD
+          Triggered by: ${{ github.actor }}" || echo "[INFO] No changes to commit"
+          
+          echo "[INFO] Pushing to origin..."
+          git push origin HEAD || echo "[WARNING] Push failed or no changes"
+          echo "[SUCCESS] Changes committed and pushed"
+
+      - name: Upload Artifacts
+        if: always()
+        run: |
+          echo "[STEP] Preparing artifacts for upload..."
+          echo "[INFO] Artifact Name: ${{ env.ARTIFACT_NAME }}"
+          echo "[INFO] Retention Days: ${{ env.ARTIFACT_RETENTION_DAYS }}"
+          echo ""
+          echo "[INFO] Solutions directory contents:"
+          find "${{ env.SOLUTIONS_DIR }}" -type f 2>/dev/null | wc -l
+          echo ""
+          echo "[INFO] Managed solutions directory contents:"
+          ls -lh "${{ env.MANAGED_SOLUTIONS_DIR }}" 2>/dev/null || echo "  (Directory may not exist)"
 
       - name: Upload artifacts
         if: always()
@@ -108,3 +261,18 @@ jobs:
             ${{ env.SOLUTIONS_DIR }}/
             ${{ env.MANAGED_SOLUTIONS_DIR }}/
           retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
+
+      - name: Final Summary
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "WORKFLOW EXECUTION SUMMARY"
+          echo "=========================================="
+          echo "[INFO] Workflow Status: ${{ job.status }}"
+          echo "[INFO] Solution: ${{ env.SOLUTION_NAME }}"
+          echo "[INFO] Environment: ${{ env.ENVIRONMENT_URL }}"
+          echo "[INFO] Extraction Type: ${{ env.SOLUTION_TYPE }}"
+          echo ""
+          echo "[INFO] Final directory structure:"
+          find . -name "${{ env.SOLUTION_NAME }}" -o -name "*managed*" 2>/dev/null | head -10
+          echo "=========================================="
