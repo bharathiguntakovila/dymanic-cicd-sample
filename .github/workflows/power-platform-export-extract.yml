@@ -1,0 +1,105 @@
+name: Export and Extract Power Platform Solution
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment_url:
+        description: 'Power Platform environment URL'
+        required: true
+        type: string
+      solution_name:
+        description: 'Solution name to export'
+        required: true
+        type: string
+      solution_version:
+        description: 'Solution version (optional)'
+        required: false
+        type: string
+
+jobs:
+  export-extract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Power Platform CLI
+        uses: microsoft/powerplatform-actions/setup@v1
+
+      - name: Authenticate Power Platform
+        uses: microsoft/powerplatform-actions/authenticate@v1
+        with:
+          environment-url: ${{ inputs.environment_url }}
+          tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
+          app-id: ${{ secrets.POWERPLATFORM_APP_ID }}
+          client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
+
+      - name: Export solution as managed
+        uses: microsoft/powerplatform-actions/export-solution@v1
+        with:
+          environment-url: ${{ inputs.environment_url }}
+          solution-name: ${{ inputs.solution_name }}
+          solution-output-file: ${{ runner.temp }}/${{ inputs.solution_name }}_managed.zip
+          managed: true
+          tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
+          app-id: ${{ secrets.POWERPLATFORM_APP_ID }}
+          client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
+
+      - name: Export solution as unmanaged
+        uses: microsoft/powerplatform-actions/export-solution@v1
+        with:
+          environment-url: ${{ inputs.environment_url }}
+          solution-name: ${{ inputs.solution_name }}
+          solution-output-file: ${{ runner.temp }}/${{ inputs.solution_name }}_unmanaged.zip
+          managed: false
+          tenant-id: ${{ secrets.POWERPLATFORM_TENANT_ID }}
+          app-id: ${{ secrets.POWERPLATFORM_APP_ID }}
+          client-secret: ${{ secrets.POWERPLATFORM_CLIENT_SECRET }}
+
+      - name: Unpack unmanaged solution
+        uses: microsoft/powerplatform-actions/unpack-solution@v1
+        with:
+          solution-file: ${{ runner.temp }}/${{ inputs.solution_name }}_unmanaged.zip
+          solution-folder: solutions/${{ inputs.solution_name }}
+          solution-type: 'Unmanaged'
+          overwrite-files: true
+
+      - name: Create solutions directory for managed
+        run: mkdir -p managed-solutions
+
+      - name: Copy managed solution
+        run: cp ${{ runner.temp }}/${{ inputs.solution_name }}_managed.zip managed-solutions/
+
+      - name: Configure git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Commit and push changes
+        run: |
+          git add solutions/ managed-solutions/
+          git commit -m "feat: Export and extract ${{ inputs.solution_name }} solution
+          
+          - Exported managed solution to managed-solutions/
+          - Extracted unmanaged solution to solutions/
+          - Environment: ${{ inputs.environment_url }}
+          - Solution: ${{ inputs.solution_name }}
+          - Version: ${{ inputs.solution_version || 'current' }}
+          
+          Triggered by: ${{ github.actor }}" || echo "No changes to commit"
+          git push origin HEAD
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: power-platform-solutions
+          path: |
+            solutions/
+            managed-solutions/
+          retention-days: 30
