@@ -8,8 +8,8 @@ on:
 # ============================================================================
 env:
   # Power Platform Configuration
-  ENVIRONMENT_URL: "https://yourorg.crm.dynamics.com"
-  SOLUTION_NAME: "MySolution"
+  ENVIRONMENT_URL: "https://indev.crm.dynamics.com"
+  SOLUTION_NAME: "Sam-lab"
   SOLUTION_VERSION: "1.0.0"
   
   # Git Configuration
