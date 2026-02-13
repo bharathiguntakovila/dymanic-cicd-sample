@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{b6baf0ff-0a42-46c9-9c5c-cde2ebbe414f}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form headerdensity="HighWithControls">
+      <tabs>
+        <tab verticallayout="true" id="b6baf0ff-0a42-46c9-9c5c-cde2ebbe414f" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="80294509-72ca-4340-a4e8-e7ae5252ad94" labelid="9039934c-089d-4b0c-af0d-523f933d3140">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="b74ad4d9-56e8-43b7-a1ce-8ff7dabc9c25" labelid="7bed3f05-7221-4685-a6df-89a9b9369b6d">
+                        <labels>
+                          <label description="Department Name" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_departmentname" classid="6a56c1f2-bbf4-4106-9977-acfd95b83b7b" datafieldname="crc44_departmentname" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="ff0fabbb-1293-4197-9bc9-dc4d0d3a0186" labelid="4a4d9b45-6de4-4ca3-b2e8-486f848327ed">
+                        <labels>
+                          <label description="University" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_universityid" classid="8dd5256d-d70c-4247-b6d4-c4a728738beb" datafieldname="crc44_universityid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="e7408007-7045-4b80-89d5-873556f5369b" labelid="75c3a926-871c-4433-a0e8-128241e753ec">
+                        <labels>
+                          <label description="crc44_universityidname" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_universityidname" classid="e909c867-949f-4af4-85a7-b1bd376222c2" datafieldname="crc44_universityidname" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="ef0363cb-d94a-44f7-bc17-914f04a7c478" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="34c78675-2fce-4968-bbbe-52b979058f9f" showlabel="false" labelid="f9871919-3e59-4e17-94fa-44e4373c361b">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="5d33a377-6242-46bc-8b48-40c9442e91e1" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="812bf2a6-2228-4c78-bebc-52420530bfaa" showlabel="false" labelid="f163fc80-e473-44ad-8ee0-39ed26c645c9">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="1" FallbackForm="true">
+        <Role Id="57fcc87b-52d5-47ac-b4cd-20319ef1b8d1" />
+        <Role Id="116d425b-20a7-46e3-af36-59a2ed915343" />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Department" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

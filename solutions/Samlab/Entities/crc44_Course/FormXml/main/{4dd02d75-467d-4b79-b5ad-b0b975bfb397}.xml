@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{4dd02d75-467d-4b79-b5ad-b0b975bfb397}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form headerdensity="HighWithControls">
+      <tabs>
+        <tab verticallayout="true" id="4dd02d75-467d-4b79-b5ad-b0b975bfb397" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="47a18838-8d56-4f9b-91cb-ca7455a893fd" labelid="d8bc8dc7-bcba-4617-a107-5c37fb185e9a">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="26fd24dc-a22d-4dc0-a9e4-9afd24538da8" labelid="c7969b41-f09e-46e4-963d-95a5e07571c9">
+                        <labels>
+                          <label description="Course Name" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_coursename" classid="69258fbc-df40-4488-8fed-faad68e9c741" datafieldname="crc44_coursename" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="6bd04e0c-cbf6-43ef-98a1-abd2dead3d06" labelid="4a12b317-2d41-454a-9e89-4e57982367e0">
+                        <labels>
+                          <label description="Department" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_departmentid" classid="a5906c34-0d4c-46fe-94d8-587f72275245" datafieldname="crc44_departmentid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="276ff522-d0c1-4608-9af1-79f47afe719e" labelid="2830e726-2434-4633-801c-fd39668beba1">
+                        <labels>
+                          <label description="crc44_departmentidname" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_departmentidname" classid="152044e2-33ad-4a51-b4b6-8cfe5a77f418" datafieldname="crc44_departmentidname" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="b4cd6a57-ba68-40b7-ae9d-213b28651b7e" labelid="89ac7ec4-6940-4237-a19e-a36cbea62a22">
+                        <labels>
+                          <label description="Professor" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_professorid" classid="22220d81-103a-402a-9a3c-cdddda67660e" datafieldname="crc44_professorid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="f01f5707-e3b2-4ba6-b060-500a5e8dc662" labelid="e80532c5-0262-431b-b1ae-76a40666cefe">
+                        <labels>
+                          <label description="crc44_professoridname" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_professoridname" classid="c378b2f3-fd49-4099-8d2a-87fc9675c34e" datafieldname="crc44_professoridname" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="d0e5231e-8cd9-40e1-a136-59345ca93d1f" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="20edc92b-a4cd-4c11-a912-6593e4ded9ab" showlabel="false" labelid="b76b214b-2c90-46db-b0fb-e8438d6ad06f">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="5b35c635-7da1-4c12-bc76-04d25ae13b6b" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="14549f4a-707d-45bc-8e78-3d56798bc8a4" showlabel="false" labelid="51546b35-82e8-4a8a-ac40-6c94619d76c3">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="1" FallbackForm="true">
+        <Role Id="c8c390f8-9118-4105-9dd4-7317f0621032" />
+        <Role Id="33361635-d78c-4bfd-96f0-af9f88368bfe" />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Course" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

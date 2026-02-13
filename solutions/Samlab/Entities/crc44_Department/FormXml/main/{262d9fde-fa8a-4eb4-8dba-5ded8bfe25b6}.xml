@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{262d9fde-fa8a-4eb4-8dba-5ded8bfe25b6}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{17c96b9c-dd9f-465a-8bbd-305728eaef54}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{b137c0c5-f6ee-46d0-a768-5e483c60a9b0}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{3633b32d-c8ec-40db-9388-9a3deec6f664}">
+                        <labels>
+                          <label description="Department Name" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_departmentname" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="crc44_departmentname" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{413ac082-455f-474a-a1e7-b4ed24671d8e}">
+                        <labels>
+                          <label description="Owner" languagecode="1033" />
+                        </labels>
+                        <control id="ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{fd3cd556-4a8d-47c4-be2f-f47b894af025}">
+                        <labels>
+                          <label description="University" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_universityid" classid="{270bd3db-d9af-4782-9025-509e298dec0a}" datafieldname="crc44_universityid" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

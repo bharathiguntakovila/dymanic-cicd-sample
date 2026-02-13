@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{c9c27809-294c-4521-ab11-4f8d0bfca7c8}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="crc44_coursename" select="1" icon="1" preview="1">
+        <row name="result" id="crc44_courseid">
+          <cell name="crc44_coursename" width="300" />
+          <cell name="crc44_departmentid" width="150" />
+          <cell name="crc44_professorid" width="150" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="crc44_course">
+          <attribute name="crc44_courseid" />
+          <attribute name="crc44_coursename" />
+          <attribute name="createdon" />
+          <order attribute="crc44_coursename" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+          <attribute name="crc44_departmentid" />
+          <attribute name="crc44_professorid" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Active Courses" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

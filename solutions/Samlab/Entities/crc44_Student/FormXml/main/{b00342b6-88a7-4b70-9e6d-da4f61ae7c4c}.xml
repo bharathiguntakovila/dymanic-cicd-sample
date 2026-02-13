@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{b00342b6-88a7-4b70-9e6d-da4f61ae7c4c}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form headerdensity="HighWithControls">
+      <tabs>
+        <tab verticallayout="true" id="b00342b6-88a7-4b70-9e6d-da4f61ae7c4c" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="9e8e77fa-30fd-49d2-8bf7-33c5002fb646" labelid="f02924a4-0f26-4bd3-a0af-f20b3fcdb3b9">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="155b21b0-c192-4df9-af7d-666b6a90397e" labelid="41a4e97d-6657-44df-90aa-ca7fcfb5f729">
+                        <labels>
+                          <label description="Email" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_email" classid="b00cf929-d2df-47ed-90aa-e82c875a8338" datafieldname="crc44_email" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="9dde9729-1922-4919-84c3-ed745cd0b3cc" labelid="3e07d599-ad52-4c96-a3e5-05425c399776">
+                        <labels>
+                          <label description="Student Name" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_studentname" classid="74332180-03ce-426c-9140-1caa72ccad06" datafieldname="crc44_studentname" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="fc1a74db-1047-4acc-b231-4ac36a2d7c96" labelid="3f864e9f-22a9-4833-8f76-8bda546fa6d8">
+                        <labels>
+                          <label description="University" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_universityid" classid="433679cf-ce74-4847-9c12-0a8bcad524a0" datafieldname="crc44_universityid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="0806ba4b-5bc2-493f-974e-4d0240aac980" labelid="7be9f925-144d-4eca-988f-de901c507fff">
+                        <labels>
+                          <label description="crc44_universityidname" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_universityidname" classid="135c801f-2a50-4d6f-8cd1-a469d259e72a" datafieldname="crc44_universityidname" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="a730f172-e6eb-4384-bfd7-8b96aa60b27c" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="d94f9b92-7237-4445-9bea-211c9836374c" showlabel="false" labelid="707d3672-6256-40c5-9ad7-05328b36b4d2">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="465fd10d-73f2-4ae9-8f08-9c458e3dfd65" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="daa8d161-bee7-4f44-8d83-2ccb7cb351af" showlabel="false" labelid="f1851910-54fe-4436-939a-c152e2d519e0">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="1" FallbackForm="true">
+        <Role Id="ed6d44cd-50c2-4185-b80b-cd4db562b60e" />
+        <Role Id="4f5a53ca-4ec8-4412-a62e-d992d7de5541" />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Student" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

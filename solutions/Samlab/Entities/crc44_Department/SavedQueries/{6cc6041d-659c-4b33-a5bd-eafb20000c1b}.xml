@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{6cc6041d-659c-4b33-a5bd-eafb20000c1b}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="crc44_departmentname" select="1" icon="1" preview="1">
+        <row name="result" id="crc44_departmentid">
+          <cell name="crc44_departmentname" width="300" />
+          <cell name="crc44_universityid" width="150" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="crc44_department">
+          <attribute name="crc44_departmentid" />
+          <attribute name="crc44_departmentname" />
+          <attribute name="createdon" />
+          <order attribute="crc44_departmentname" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+          <attribute name="crc44_universityid" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Active Departments" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{ae153f67-ab04-4302-a3b5-6d2279e71765}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>0</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form headerdensity="HighWithControls">
+      <tabs>
+        <tab verticallayout="true" id="ae153f67-ab04-4302-a3b5-6d2279e71765" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="cb666ec2-d8df-4514-b949-a824944e9561" labelid="8287580e-7e8b-4a39-952d-9f8f73f4a445">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="17d1e78e-17cd-43a1-b3a5-5db24a862cc1" labelid="d3b4f385-4263-465b-9755-1763aa6c1cd2">
+                        <labels>
+                          <label description="Department" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_departmentid" classid="67c24e22-6e3b-40e7-9d63-015bed16fb7f" datafieldname="crc44_departmentid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="8365df21-d4ea-4ac0-ab6b-fc82cc1df06c" labelid="b7f314ae-0a51-48a0-b99a-76143cd37d5d">
+                        <labels>
+                          <label description="crc44_departmentidname" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_departmentidname" classid="d7450d6c-c2fc-44f7-9442-8fb1537e8eec" datafieldname="crc44_departmentidname" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="410c81e6-4840-45c7-8934-15386b3541bb" labelid="c01750e5-1b69-4ee5-82f6-5d1d5ab122b5">
+                        <labels>
+                          <label description="Email" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_email" classid="3f538ab4-975b-43b1-b7cc-963534bef64e" datafieldname="crc44_email" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="223b8300-b691-4088-b2fe-c633dad91f28" labelid="fc4084d0-ab7e-4786-9fa9-0c32faed7b35">
+                        <labels>
+                          <label description="Professor Name" languagecode="1033" />
+                        </labels>
+                        <control id="crc44_professorname" classid="8c281448-2a86-4137-8fd4-b953ef9783e1" datafieldname="crc44_professorname" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="a563cbf5-1032-48d3-9e5c-7cc8feb50eed" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="5387667e-19b9-41dc-a9cf-e44fb1b78ea5" showlabel="false" labelid="53768494-d51a-42ee-92b2-d0173ebdb15e">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="7654ac9b-e6aa-4ecc-b029-197559112814" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="0ec5dec1-9e6a-4a79-b38c-b237b3d75a24" showlabel="false" labelid="3b16a78c-f04c-458f-89f5-abe1d60d90af">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="1" FallbackForm="true">
+        <Role Id="d7e9dcbd-8e87-4a19-9acd-2319ab757dee" />
+        <Role Id="fd4fb35d-0558-49eb-b636-808dc65e04a3" />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Professor" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>
