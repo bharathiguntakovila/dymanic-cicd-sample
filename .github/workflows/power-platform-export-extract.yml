@@ -179,14 +179,16 @@ jobs:
           echo "[STEP] Exporting solution as managed..."
           echo "[INFO] Solution Name: ${{ env.SOLUTION_NAME }}"
           echo "[INFO] Output File: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip"
+          echo "[INFO] Environment: ${{ env.ENVIRONMENT_URL }}"
           
           export PATH="$PATH:$HOME/.dotnet/tools"
           
           $HOME/.dotnet/tools/pac solution export \
+            --environment "${{ env.ENVIRONMENT_URL }}" \
             --name "${{ env.SOLUTION_NAME }}" \
             --path "${{ runner.temp }}/${{ env.SOLUTION_NAME }}_managed.zip" \
             --managed \
-            --force || {
+            --overwrite || {
               echo "[ERROR] Failed to export managed solution"
               exit 1
             }
@@ -200,13 +202,15 @@ jobs:
           echo "[STEP] Exporting solution as unmanaged..."
           echo "[INFO] Solution Name: ${{ env.SOLUTION_NAME }}"
           echo "[INFO] Output File: ${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip"
+          echo "[INFO] Environment: ${{ env.ENVIRONMENT_URL }}"
           
           export PATH="$PATH:$HOME/.dotnet/tools"
           
           $HOME/.dotnet/tools/pac solution export \
+            --environment "${{ env.ENVIRONMENT_URL }}" \
             --name "${{ env.SOLUTION_NAME }}" \
             --path "${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip" \
-            --force || {
+            --overwrite || {
               echo "[ERROR] Failed to export unmanaged solution"
               exit 1
             }
