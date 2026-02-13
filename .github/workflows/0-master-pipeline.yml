@@ -1,4 +1,4 @@
-name: Master Pipeline Orchestrator
+name: 'Master Pipeline Orchestrator'
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  SOLUTION_NAME: "Samlab"
+  SOLUTION_NAME: 'Samlab'
 
 jobs:
   # ========================================================================
@@ -35,7 +35,7 @@ jobs:
   deploy-qa:
     name: "🟦 QA Deployment"
     needs: stage-1-qa
-    uses: ./.github/workflows/1-deploy-qa.yml@main
+    uses: ./.github/workflows/1-deploy-qa.yml
     with:
       environment_name: "QA"
     secrets: inherit
@@ -86,7 +86,7 @@ jobs:
   deploy-cat:
     name: "🟨 CAT Deployment"
     needs: stage-2-cat
-    uses: ./.github/workflows/2-deploy-cat.yml@main
+    uses: ./.github/workflows/2-deploy-cat.yml
     with:
       environment_name: "CAT"
     secrets: inherit
@@ -141,7 +141,7 @@ jobs:
   deploy-prod:
     name: "🔴 Production Deployment"
     needs: stage-3-prod
-    uses: ./.github/workflows/3-deploy-production.yml@main
+    uses: ./.github/workflows/3-deploy-production.yml
     with:
       environment_name: "Production"
     secrets: inherit
