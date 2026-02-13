@@ -11,12 +11,12 @@ on:
 
 # Configuration Variables (update these as needed)
 env:
-  ENVIRONMENT_URL: ${{ secrets.PROD_ENVIRONMENT_URL }}
+  ENVIRONMENT_URL: ${{ secrets.ENVIRONMENT_URL }}
   SOLUTION_NAME: "Samlab"
   SOLUTION_DIR: solutions/Samlab
-  APP_ID: ${{ secrets.PROD_APP_ID }}
-  CLIENT_SECRET: ${{ secrets.PROD_CLIENT_SECRET }}
-  TENANT_ID: ${{ secrets.PROD_TENANT_ID }}
+  APP_ID: ${{ secrets.APP_ID }}
+  CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+  TENANT_ID: ${{ secrets.TENANT_ID }}
 
 jobs:
   approval-gate:
