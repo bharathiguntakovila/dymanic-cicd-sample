@@ -85,45 +85,21 @@ jobs:
       - name: Install Power Platform Tools
         run: |
           echo "[STEP] Installing Power Platform Tools and PAC CLI..."
-          
-          # Check if dotnet is installed
-          echo "[INFO] Checking for dotnet..."
-          which dotnet || {
-            echo "[ERROR] dotnet not found, checking if available..."
-          }
-          
-          # Install PAC CLI using dotnet tool
           echo "[INFO] Installing PAC CLI via dotnet..."
-          dotnet tool install --global Microsoft.PowerApps.CLI.Tool || {
-            echo "[WARNING] Installation failed, trying alternative method..."
-            dotnet tool update --global Microsoft.PowerApps.CLI.Tool --add-source https://api.nuget.org/v3/index.json || true
-          }
-          
-          echo "[SUCCESS] Power Platform Tools installation attempted"
-          echo "[INFO] Checking pac command location:"
-          which pac || echo "[WARNING] pac not found yet, checking PATH..."
-          
-          # Add dotnet tools to PATH if needed
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          echo "[INFO] Updated PATH: $PATH"
-          
-          # Verify PAC installation
+          dotnet tool install --global Microsoft.PowerApps.CLI.Tool 2>&1 | tail -1
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
+          echo "[SUCCESS] Power Platform Tools installation completed"
           echo "[INFO] Verifying PAC CLI:"
-          pac help > /dev/null 2>&1 || {
-            echo "[ERROR] PAC CLI not available"
-            $HOME/.dotnet/tools/pac help > /dev/null 2>&1 || echo "[ERROR] PAC not found in tools directory either"
-          }
-          echo "[SUCCESS] PAC CLI verified"
+          $HOME/.dotnet/tools/pac help > /dev/null 2>&1 && echo "[SUCCESS] PAC CLI verified" || echo "[ERROR] PAC CLI verification failed"
 
       - name: Display PAC CLI Info
         run: |
           echo "[STEP] Displaying PAC CLI information..."
-          
-          # Ensure PATH includes dotnet tools
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
           echo "[INFO] PAC CLI Available Commands:"
-          $HOME/.dotnet/tools/pac help | head -20
+          $HOME/.dotnet/tools/pac help 2>&1 | head -20
 
       - name: Authenticate to Power Platform
         run: |
@@ -131,17 +107,14 @@ jobs:
           echo "[INFO] Environment URL: ${{ env.ENVIRONMENT_URL }}"
           echo "[INFO] Using application-id: ${{ secrets.POWERPLATFORM_APP_ID }}"
           echo "[INFO] Using tenant: ${{ secrets.POWERPLATFORM_TENANT_ID }}"
-          
-          # Ensure PATH includes dotnet tools
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
           echo "[INFO] Attempting service principal authentication with cleartext caching..."
           echo "[INFO] Using PAC CLI auth create with:"
-          echo "  - applicationId: ${{ secrets.POWERPLATFORM_APP_ID }}"
+          echo "  - applicationId: ${{ secrets.APP_ID }}"
           echo "  - clientSecret: ***"
-          echo "  - tenant: ${{ secrets.POWERPLATFORM_TENANT_ID }}"
+          echo "  - tenant: ${{ secrets.TENANT_ID }}"
           echo "  - environment: ${{ env.ENVIRONMENT_URL }}"
-          
           $HOME/.dotnet/tools/pac auth create \
             --applicationId "${{ secrets.POWERPLATFORM_APP_ID }}" \
             --clientSecret "${{ secrets.POWERPLATFORM_CLIENT_SECRET }}" \

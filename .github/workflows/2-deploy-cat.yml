@@ -93,10 +93,12 @@ jobs:
           echo "[INFO] ======================================"
           echo "[INFO] Installing Power Platform CLI (PAC)"
           echo "[INFO] ======================================"
-          dotnet tool install --global Microsoft.PowerApps.CLI.Tool
-          export PATH="$PATH:$HOME/.dotnet/tools"
+          dotnet tool install --global Microsoft.PowerApps.CLI.Tool 2>&1 | tail -1
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
           echo "[SUCCESS] PAC CLI installed"
-          pac help > /dev/null && echo "[SUCCESS] PAC CLI verified" || echo "[ERROR] PAC CLI verification failed"
+          echo "[INFO] Verifying installation..."
+          $HOME/.dotnet/tools/pac help > /dev/null 2>&1 && echo "[SUCCESS] PAC CLI verified" || echo "[ERROR] PAC CLI verification failed"
           echo "[INFO] ======================================"
 
       - name: "[STEP 6] Display PAC CLI Information"
@@ -104,8 +106,9 @@ jobs:
           echo "[INFO] ======================================"
           echo "[INFO] PAC CLI Installation Details"
           echo "[INFO] ======================================"
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          pac help | head -20
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
+          $HOME/.dotnet/tools/pac help 2>&1 | head -20
           echo "[INFO] ======================================"
 
       - name: "[STEP 7] Authenticate to CAT Environment"
@@ -113,8 +116,9 @@ jobs:
           echo "[INFO] ======================================"
           echo "[INFO] Authenticating to CAT Environment"
           echo "[INFO] ======================================"
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          pac auth create \
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
+          $HOME/.dotnet/tools/pac auth create \
             --applicationId "${{ env.APP_ID }}" \
             --clientSecret "${{ env.CLIENT_SECRET }}" \
             --tenant "${{ env.TENANT_ID }}" \
@@ -131,8 +135,9 @@ jobs:
           echo "[INFO] ======================================"
           echo "[INFO] Verifying Connection to CAT Environment"
           echo "[INFO] ======================================"
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          pac solution list || {
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
+          $HOME/.dotnet/tools/pac solution list || {
             echo "[ERROR] Failed to connect to environment"
             exit 1
           }
@@ -144,9 +149,10 @@ jobs:
           echo "[INFO] ======================================"
           echo "[INFO] Packing Solution Before Import"
           echo "[INFO] ======================================"
-          export PATH="$PATH:$HOME/.dotnet/tools"
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
           mkdir -p /tmp/solutions
-          pac solution pack \
+          $HOME/.dotnet/tools/pac solution pack \
             --zipfile "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
             --folder "${{ env.SOLUTION_DIR }}" \
             --packagetype Unmanaged || {
@@ -165,8 +171,9 @@ jobs:
           echo "[INFO] ======================================"
           echo "[INFO] Importing Solution to CAT Environment"
           echo "[INFO] ======================================"
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          pac solution import \
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
+          $HOME/.dotnet/tools/pac solution import \
             --environment "${{ env.ENVIRONMENT_URL }}" \
             --zipfile "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
             --force || {
@@ -181,9 +188,10 @@ jobs:
           echo "[INFO] ======================================"
           echo "[INFO] Verifying Solution in CAT Environment"
           echo "[INFO] ======================================"
-          export PATH="$PATH:$HOME/.dotnet/tools"
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
           echo "[INFO] Available solutions:"
-          pac solution list || {
+          $HOME/.dotnet/tools/pac solution list || {
             echo "[WARNING] Could not list solutions"
           }
           echo "[SUCCESS] Solution import verification complete"
