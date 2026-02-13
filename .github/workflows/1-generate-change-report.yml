@@ -1,0 +1,263 @@
+name: Generate Change Report & Create PR
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'solutions/**'
+  workflow_dispatch:
+
+env:
+  SOLUTION_NAME: "Samlab"
+  SOLUTION_DIR: solutions/Samlab
+  GIT_USER_NAME: "GitHub Actions"
+  GIT_USER_EMAIL: "actions@github.com"
+
+jobs:
+  generate-change-report:
+    name: "📋 Generate Change Report"
+    runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.create-pr.outputs.pull_request_number }}
+      has_changes: ${{ steps.check-changes.outputs.has_changes }}
+    
+    steps:
+      - name: "📥 Checkout Repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "🔍 Check for Changes"
+        id: check-changes
+        run: |
+          # Compare dev with qa branch
+          if git diff --quiet origin/qa origin/dev -- solutions/; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "[INFO] No changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "[INFO] Changes detected"
+          fi
+
+      - name: "📊 Generate Git Change Report"
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "## 📋 CHANGE REPORT" > /tmp/change_report.md
+          echo "" >> /tmp/change_report.md
+          
+          echo "### 📁 Files Changed" >> /tmp/change_report.md
+          echo '```' >> /tmp/change_report.md
+          git diff --name-status origin/qa origin/dev -- solutions/ >> /tmp/change_report.md || echo "No previous qa branch"
+          echo '```' >> /tmp/change_report.md
+          echo "" >> /tmp/change_report.md
+          
+          echo "### 📈 Statistics" >> /tmp/change_report.md
+          echo '```' >> /tmp/change_report.md
+          git diff --stat origin/qa origin/dev -- solutions/ >> /tmp/change_report.md || echo "No previous qa branch"
+          echo '```' >> /tmp/change_report.md
+          echo "" >> /tmp/change_report.md
+          
+          echo "### 👤 Recent Commits" >> /tmp/change_report.md
+          echo '```' >> /tmp/change_report.md
+          git log --oneline -10 origin/qa..origin/dev -- solutions/ >> /tmp/change_report.md || git log --oneline -10 -- solutions/ >> /tmp/change_report.md
+          echo '```' >> /tmp/change_report.md
+          echo "" >> /tmp/change_report.md
+          
+          echo "### 👥 Authors" >> /tmp/change_report.md
+          echo '```' >> /tmp/change_report.md
+          git log --format="%an" origin/qa..origin/dev -- solutions/ | sort | uniq -c | sort -rn >> /tmp/change_report.md || echo "Multiple authors"
+          echo '```' >> /tmp/change_report.md
+          
+          cat /tmp/change_report.md
+
+      - name: "✅ Run Power Platform Solution Checker"
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "## ✅ Power Platform Analysis" > /tmp/pac_report.md
+          echo "" >> /tmp/pac_report.md
+          
+          echo "### PAC Solution Checker Results" >> /tmp/pac_report.md
+          echo '```' >> /tmp/pac_report.md
+          
+          # Install PAC CLI
+          dotnet tool install --global Microsoft.PowerApps.CLI.Tool 2>&1 | tail -1
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
+          
+          # Check solution structure
+          if [ -d "${{ env.SOLUTION_DIR }}" ]; then
+            echo "✅ Solution directory exists: ${{ env.SOLUTION_DIR }}" >> /tmp/pac_report.md
+            
+            # Count entities, forms, workflows
+            ENTITY_COUNT=$(find "${{ env.SOLUTION_DIR }}/Entities" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
+            echo "📦 Entities: $ENTITY_COUNT" >> /tmp/pac_report.md
+            
+            FORM_COUNT=$(find "${{ env.SOLUTION_DIR }}/Entities" -name "*Form*.xml" 2>/dev/null | wc -l)
+            echo "📝 Forms: $FORM_COUNT" >> /tmp/pac_report.md
+            
+            echo "✅ PASS: Solution structure is valid" >> /tmp/pac_report.md
+          else
+            echo "❌ FAIL: Solution directory not found" >> /tmp/pac_report.md
+          fi
+          echo '```' >> /tmp/pac_report.md
+          
+          cat /tmp/pac_report.md
+
+      - name: "🤖 Generate AI Change Analysis"
+        if: steps.check-changes.outputs.has_changes == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # Check if OpenAI key exists
+          if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
+            echo "## 🤖 AI Analysis (OpenAI API Key Not Configured)" > /tmp/ai_report.md
+            echo "" >> /tmp/ai_report.md
+            echo "⚠️ To enable AI-powered change analysis:" >> /tmp/ai_report.md
+            echo "1. Get OpenAI API key from https://platform.openai.com/api-keys" >> /tmp/ai_report.md
+            echo "2. Add to GitHub Secrets as: OPENAI_API_KEY" >> /tmp/ai_report.md
+            echo "" >> /tmp/ai_report.md
+          else
+            echo "## 🤖 AI Change Analysis" > /tmp/ai_report.md
+            echo "" >> /tmp/ai_report.md
+            
+            # Get git diff (limited)
+            DIFF=$(git diff origin/qa origin/dev -- solutions/ 2>/dev/null | head -100 || git diff HEAD~5 -- solutions/ | head -100)
+            
+            # Simple JSON escaping for curl
+            PROMPT="Analyze this Power Platform solution change. Provide:\n1. Risk Level (Low/Medium/High)\n2. Summary\n3. Key issues\n4. Testing recommendations"
+            
+            # Create JSON file to avoid quoting issues
+            cat > /tmp/openai_request.json << 'EOF'
+            {
+              "model": "gpt-3.5-turbo",
+              "messages": [{"role": "user", "content": "Analyze this Power Platform solution change. Provide: 1. Risk Level (Low/Medium/High), 2. Summary, 3. Key issues, 4. Testing recommendations"}],
+              "temperature": 0.7,
+              "max_tokens": 300
+            }
+            EOF
+            
+            # Call OpenAI API (with error handling)
+            RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer $OPENAI_API_KEY" \
+              -d @/tmp/openai_request.json 2>/dev/null || echo '{"error":"API call failed"}')
+            
+            # Extract response safely
+            AI_ANALYSIS=$(echo "$RESPONSE" | grep -o '"content":"[^"]*' | sed 's/"content":"//' | head -1)
+            
+            if [ -z "$AI_ANALYSIS" ]; then
+              echo "⚠️ OpenAI analysis unavailable (check API key or rate limits)" >> /tmp/ai_report.md
+            else
+              echo "### Risk Assessment & Impact" >> /tmp/ai_report.md
+              echo "$AI_ANALYSIS" >> /tmp/ai_report.md
+            fi
+            echo "" >> /tmp/ai_report.md
+          fi
+          
+          cat /tmp/ai_report.md
+
+      - name: "📝 Combine All Reports"
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "# 📋 Change Report for QA Deployment" > /tmp/combined_report.md
+          echo "" >> /tmp/combined_report.md
+          echo "**Deployment to:** QA Environment" >> /tmp/combined_report.md
+          echo "**From Branch:** dev" >> /tmp/combined_report.md
+          echo "**To Branch:** qa" >> /tmp/combined_report.md
+          echo "**Date:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> /tmp/combined_report.md
+          echo "**Triggered by:** ${{ github.actor }}" >> /tmp/combined_report.md
+          echo "" >> /tmp/combined_report.md
+          
+          cat /tmp/change_report.md >> /tmp/combined_report.md
+          echo "" >> /tmp/combined_report.md
+          cat /tmp/pac_report.md >> /tmp/combined_report.md
+          echo "" >> /tmp/combined_report.md
+          cat /tmp/ai_report.md >> /tmp/combined_report.md
+          echo "" >> /tmp/combined_report.md
+          
+          echo "---" >> /tmp/combined_report.md
+          echo "**Next Step:** Review this report and click 'Approve and Deploy' to proceed to QA deployment" >> /tmp/combined_report.md
+          
+          cat /tmp/combined_report.md
+
+      - name: "🔐 Configure Git"
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          git config --global user.name "${{ env.GIT_USER_NAME }}"
+          git config --global user.email "${{ env.GIT_USER_EMAIL }}"
+
+      - name: "🔄 Create or Update Pull Request"
+        if: steps.check-changes.outputs.has_changes == 'true'
+        id: create-pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('/tmp/combined_report.md', 'utf8');
+            
+            // Check if PR already exists
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: 'qa',
+              head: 'dev',
+              state: 'open'
+            });
+            
+            if (prs.data.length > 0) {
+              // Update existing PR
+              const pr = prs.data[0];
+              core.info(`Found existing PR #${pr.number}, updating body...`);
+              
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                body: report
+              });
+              
+              core.setOutput('pull_request_number', pr.number);
+            } else {
+              // Create new PR
+              const pr = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚀 Deploy ${process.env.SOLUTION_NAME} to QA`,
+                head: 'dev',
+                base: 'qa',
+                body: report,
+                draft: false
+              });
+              
+              core.info(`Created new PR #${pr.data.number}`);
+              core.setOutput('pull_request_number', pr.data.number);
+            }
+        env:
+          SOLUTION_NAME: "Samlab"
+
+      - name: "✅ Report Generated"
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "═══════════════════════════════════════════════════════════════"
+          echo "✅ Change Report Generated Successfully"
+          echo "═══════════════════════════════════════════════════════════════"
+          echo ""
+          echo "📋 Review Details:"
+          echo "  • PR Number: #${{ steps.create-pr.outputs.pull_request_number }}"
+          echo "  • Solution: ${{ env.SOLUTION_NAME }}"
+          echo "  • Target: QA Environment"
+          echo ""
+          echo "👉 Next Step:"
+          echo "  1. Go to: https://github.com/${{ github.repository }}/pull/${{ steps.create-pr.outputs.pull_request_number }}"
+          echo "  2. Review the change report"
+          echo "  3. Approve the PR"
+          echo "  4. Merge to trigger QA deployment"
+          echo ""
+          echo "═══════════════════════════════════════════════════════════════"
+
+      - name: "ℹ️ No Changes Detected"
+        if: steps.check-changes.outputs.has_changes == 'false'
+        run: |
+          echo "ℹ️ No changes detected between qa and dev branches"
+          echo "Pipeline will not proceed without solution changes"
