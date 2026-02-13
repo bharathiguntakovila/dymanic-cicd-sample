@@ -175,8 +175,9 @@ jobs:
           export PATH
           $HOME/.dotnet/tools/pac solution import \
             --environment "${{ env.ENVIRONMENT_URL }}" \
-            --zipfile "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
-            --force || {
+            --path "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
+            --force-overwrite \
+            --publish-changes || {
             echo "[ERROR] Solution import failed"
             exit 1
           }
