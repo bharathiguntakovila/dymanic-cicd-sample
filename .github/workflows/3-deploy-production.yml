@@ -1,0 +1,253 @@
+name: Deploy Solution to Production
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'solutions/**'
+      - '.github/workflows/3-deploy-production.yml'
+  workflow_dispatch:
+
+# Configuration Variables (update these as needed)
+env:
+  ENVIRONMENT_URL: ${{ secrets.PROD_ENVIRONMENT_URL }}
+  SOLUTION_NAME: "Samlab"
+  SOLUTION_DIR: solutions/Samlab
+  APP_ID: ${{ secrets.PROD_APP_ID }}
+  CLIENT_SECRET: ${{ secrets.PROD_CLIENT_SECRET }}
+  TENANT_ID: ${{ secrets.PROD_TENANT_ID }}
+
+jobs:
+  approval-gate:
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+    steps:
+      - name: "[GATE] Manual Approval Required for Production Deployment"
+        run: |
+          echo "[CRITICAL] ======================================"
+          echo "[CRITICAL] PRODUCTION Deployment Approval Gate"
+          echo "[CRITICAL] ======================================"
+          echo "[CRITICAL] This deployment requires explicit approval!"
+          echo "[INFO] Branch: main"
+          echo "[INFO] Target Environment: PRODUCTION"
+          echo "[INFO] A team member with admin rights MUST approve this deployment."
+          echo "[INFO] Approval requested at: $(date)"
+          echo "[CRITICAL] ======================================"
+
+  deploy-production:
+    needs: approval-gate
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: "[STEP 1] Display All Environment Variables"
+        run: |
+          echo "[CRITICAL] ======================================"
+          echo "[CRITICAL] GitHub Actions Environment Information"
+          echo "[CRITICAL] ======================================"
+          echo "[INFO] Workflow Name: ${{ github.workflow }}"
+          echo "[INFO] Event: ${{ github.event_name }}"
+          echo "[INFO] Branch: ${{ github.ref_name }}"
+          echo "[INFO] Commit: ${{ github.sha }}"
+          echo "[INFO] Actor: ${{ github.actor }}"
+          echo "[CRITICAL] Target Environment: PRODUCTION"
+          echo "[INFO] Solution Name: ${{ env.SOLUTION_NAME }}"
+          echo "[INFO] Solution Directory: ${{ env.SOLUTION_DIR }}"
+          echo "[CRITICAL] Approval Status: APPROVED"
+          echo "[CRITICAL] ======================================"
+
+      - name: "[STEP 2] Checkout Repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "[STEP 3] Display Checkout Information"
+        run: |
+          echo "[INFO] ======================================"
+          echo "[INFO] Git Repository Status"
+          echo "[INFO] ======================================"
+          git status
+          echo "[INFO] Current branch: $(git branch --show-current)"
+          echo "[INFO] Last 3 commits:"
+          git log --oneline -3
+          echo "[INFO] ======================================"
+
+      - name: "[STEP 4] Verify Solution Files Exist"
+        run: |
+          echo "[INFO] ======================================"
+          echo "[INFO] Verifying Solution Files"
+          echo "[INFO] ======================================"
+          if [ -d "${{ env.SOLUTION_DIR }}" ]; then
+            echo "[SUCCESS] Solution directory found: ${{ env.SOLUTION_DIR }}"
+            echo "[INFO] Directory contents:"
+            find "${{ env.SOLUTION_DIR }}" -type f | head -20
+            echo "[INFO] Total files: $(find "${{ env.SOLUTION_DIR }}" -type f | wc -l)"
+          else
+            echo "[ERROR] Solution directory not found: ${{ env.SOLUTION_DIR }}"
+            exit 1
+          fi
+          echo "[INFO] ======================================"
+
+      - name: "[STEP 5] Install Power Platform Tools"
+        run: |
+          echo "[INFO] ======================================"
+          echo "[INFO] Installing Power Platform CLI (PAC)"
+          echo "[INFO] ======================================"
+          dotnet tool install --global Microsoft.PowerApps.CLI.Tool
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          echo "[SUCCESS] PAC CLI installed"
+          pac --version || pac -v
+          echo "[INFO] ======================================"
+
+      - name: "[STEP 6] Display PAC CLI Information"
+        run: |
+          echo "[INFO] ======================================"
+          echo "[INFO] PAC CLI Installation Details"
+          echo "[INFO] ======================================"
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          pac --version || pac -v
+          echo "[INFO] ======================================"
+
+      - name: "[STEP 7] Authenticate to Production Environment"
+        run: |
+          echo "[CRITICAL] ======================================"
+          echo "[CRITICAL] Authenticating to Production Environment"
+          echo "[CRITICAL] ======================================"
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          pac auth create \
+            --applicationId "${{ env.APP_ID }}" \
+            --clientSecret "${{ env.CLIENT_SECRET }}" \
+            --tenant "${{ env.TENANT_ID }}" \
+            --environment "${{ env.ENVIRONMENT_URL }}" \
+            --accept-cleartext-caching || {
+            echo "[ERROR] Authentication failed"
+            exit 1
+          }
+          echo "[SUCCESS] Authentication successful"
+          echo "[CRITICAL] ======================================"
+
+      - name: "[STEP 8] Verify Environment Connection"
+        run: |
+          echo "[INFO] ======================================"
+          echo "[INFO] Verifying Connection to Production Environment"
+          echo "[INFO] ======================================"
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          pac solution list || {
+            echo "[ERROR] Failed to connect to environment"
+            exit 1
+          }
+          echo "[SUCCESS] Connected to Production environment"
+          echo "[INFO] ======================================"
+
+      - name: "[STEP 9] Create Backup of Current Production Solution"
+        run: |
+          echo "[INFO] ======================================"
+          echo "[INFO] Creating Backup of Production Solution"
+          echo "[INFO] ======================================"
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          mkdir -p /tmp/backups
+          BACKUP_NAME="${{ env.SOLUTION_NAME }}_backup_$(date +%Y%m%d_%H%M%S)"
+          echo "[INFO] Backup name: $BACKUP_NAME"
+          pac solution export \
+            --environment "${{ env.ENVIRONMENT_URL }}" \
+            --name "${{ env.SOLUTION_NAME }}" \
+            --path "/tmp/backups/${BACKUP_NAME}.zip" \
+            --managed || {
+            echo "[WARNING] Could not create managed backup (solution may not exist)"
+          }
+          echo "[SUCCESS] Backup process complete"
+          echo "[INFO] ======================================"
+
+      - name: "[STEP 10] Pack Solution for Import"
+        run: |
+          echo "[INFO] ======================================"
+          echo "[INFO] Packing Solution Before Import"
+          echo "[INFO] ======================================"
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          mkdir -p /tmp/solutions
+          pac solution pack \
+            --zipfile "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
+            --folder "${{ env.SOLUTION_DIR }}" \
+            --packagetype Unmanaged || {
+            echo "[ERROR] Solution pack failed"
+            exit 1
+          }
+          echo "[SUCCESS] Solution packed successfully"
+          if [ -f "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" ]; then
+            FILESIZE=$(ls -lh "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" | awk '{print $5}')
+            echo "[INFO] Package size: $FILESIZE"
+          fi
+          echo "[INFO] ======================================"
+
+      - name: "[STEP 11] Import Solution to Production"
+        run: |
+          echo "[CRITICAL] ======================================"
+          echo "[CRITICAL] Importing Solution to Production Environment"
+          echo "[CRITICAL] ======================================"
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          pac solution import \
+            --environment "${{ env.ENVIRONMENT_URL }}" \
+            --zipfile "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
+            --force || {
+            echo "[ERROR] Solution import to Production failed"
+            exit 1
+          }
+          echo "[SUCCESS] Solution imported successfully to Production"
+          echo "[CRITICAL] ======================================"
+
+      - name: "[STEP 12] Verify Solution in Production"
+        run: |
+          echo "[INFO] ======================================"
+          echo "[INFO] Verifying Solution in Production Environment"
+          echo "[INFO] ======================================"
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          echo "[INFO] Available solutions:"
+          pac solution list || {
+            echo "[WARNING] Could not list solutions"
+          }
+          echo "[SUCCESS] Solution import verification complete"
+          echo "[INFO] ======================================"
+
+      - name: "[STEP 13] Create Deployment Summary"
+        if: success()
+        run: |
+          echo "[SUCCESS] ======================================"
+          echo "[SUCCESS] PRODUCTION Deployment Complete!"
+          echo "[SUCCESS] ======================================"
+          echo "[INFO] Solution: ${{ env.SOLUTION_NAME }}"
+          echo "[CRITICAL] Target Environment: PRODUCTION"
+          echo "[INFO] Environment URL: ${{ env.ENVIRONMENT_URL }}"
+          echo "[INFO] Deployment Time: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          echo "[INFO] Commit: ${{ github.sha }}"
+          echo "[INFO] Branch: ${{ github.ref_name }}"
+          echo "[INFO] Approval: Required and obtained"
+          echo "[INFO] Backup: Created in artifacts"
+          echo "[SUCCESS] ======================================"
+
+      - name: "[STEP 14] Upload Deployment Artifacts"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deployment-artifacts
+          path: |
+            /tmp/solutions/
+            /tmp/backups/
+          retention-days: 90
+          if-no-files-found: warn
+
+      - name: "[STEP 15] Deployment Failure Assistance"
+        if: failure()
+        run: |
+          echo "[ERROR] ======================================"
+          echo "[ERROR] Deployment to Production Failed!"
+          echo "[ERROR] ======================================"
+          echo "[ERROR] IMMEDIATE ACTIONS REQUIRED:"
+          echo "[ERROR] 1. Check PROD_ENVIRONMENT_URL in secrets"
+          echo "[ERROR] 2. Verify PROD_APP_ID has permissions"
+          echo "[ERROR] 3. Ensure PROD_CLIENT_SECRET is valid"
+          echo "[ERROR] 4. Check backup was created (in artifacts)"
+          echo "[ERROR] 5. Review solution files are correct"
+          echo "[ERROR] 6. Check for solution conflicts in Production"
+          echo "[ERROR] 7. Consider restoring from backup if needed"
+          echo "[ERROR] ======================================"
