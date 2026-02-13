@@ -104,6 +104,57 @@ jobs:
           echo "[INFO] PAC CLI Available Commands:"
           $HOME/.dotnet/tools/pac help 2>&1 | head -20
 
+      - name: Validate Required Variables
+        run: |
+          echo "[STEP] Validating required environment variables..."
+          MISSING_VARS=""
+          
+          if [ -z "${{ env.ENVIRONMENT_URL }}" ]; then
+            echo "[ERROR] ENVIRONMENT_URL is not set"
+            MISSING_VARS="${MISSING_VARS}ENVIRONMENT_URL, "
+          else
+            echo "[OK] ENVIRONMENT_URL: ${{ env.ENVIRONMENT_URL }}"
+          fi
+          
+          if [ -z "${{ env.APP_ID }}" ]; then
+            echo "[ERROR] APP_ID is not set"
+            MISSING_VARS="${MISSING_VARS}APP_ID, "
+          else
+            echo "[OK] APP_ID is set"
+          fi
+          
+          if [ -z "${{ env.TENANT_ID }}" ]; then
+            echo "[ERROR] TENANT_ID is not set"
+            MISSING_VARS="${MISSING_VARS}TENANT_ID, "
+          else
+            echo "[OK] TENANT_ID is set"
+          fi
+          
+          if [ -z "${{ env.CLIENT_SECRET }}" ]; then
+            echo "[ERROR] CLIENT_SECRET is not set"
+            MISSING_VARS="${MISSING_VARS}CLIENT_SECRET, "
+          else
+            echo "[OK] CLIENT_SECRET is set"
+          fi
+          
+          if [ ! -z "$MISSING_VARS" ]; then
+            echo ""
+            echo "[ERROR] Missing or empty variables: ${MISSING_VARS%,*}"
+            echo ""
+            echo "REQUIRED ACTION:"
+            echo "Go to GitHub repository → Settings → Secrets and variables → Variables"
+            echo "Add these repository variables:"
+            echo "  - ENVIRONMENT_URL: https://your-org.crm.dynamics.com"
+            echo "  - APP_ID: your-app-id"
+            echo "  - TENANT_ID: your-tenant-id"
+            echo ""
+            echo "Add this repository secret:"
+            echo "  - CLIENT_SECRET: your-client-secret"
+            exit 1
+          fi
+          
+          echo "[SUCCESS] All required variables are set"
+
       - name: Authenticate to Power Platform
         run: |
           echo "[STEP] Authenticating to Power Platform environment..."
