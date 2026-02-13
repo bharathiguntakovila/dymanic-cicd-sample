@@ -8,6 +8,13 @@ on:
       - 'solutions/**'
       - '.github/workflows/1-deploy-qa.yml'
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      environment_name:
+        description: 'Environment name (QA/CAT/Prod)'
+        required: false
+        default: 'QA'
+        type: string
 
 # Configuration Variables (update these as needed)
 env:

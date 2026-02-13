@@ -8,6 +8,13 @@ on:
       - 'solutions/**'
       - '.github/workflows/2-deploy-cat.yml'
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      environment_name:
+        description: 'Environment name (QA/CAT/Prod)'
+        required: false
+        default: 'CAT'
+        type: string
 
 # Configuration Variables (update these as needed)
 env:
@@ -175,9 +182,8 @@ jobs:
           export PATH
           $HOME/.dotnet/tools/pac solution import \
             --environment "${{ env.ENVIRONMENT_URL }}" \
-            --path "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
-            --force-overwrite \
-            --publish-changes || {
+            --zipfile "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
+            --force || {
             echo "[ERROR] Solution import failed"
             exit 1
           }
