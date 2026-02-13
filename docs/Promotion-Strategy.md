@@ -26,18 +26,18 @@ This document explains how to promote Power Platform solutions from development 
 
 | Environment | Git Branch | Workflow | Purpose |
 |---|---|---|---|
-| **Dev (your org)** | `develop` | power-platform-export-extract | Export solutions, source of truth |
+| **Dev (your org)** | `dev` | power-platform-export-extract | Export solutions, source of truth |
 | **QA** | `qa` | 1-deploy-qa | Auto-deploy after push |
 | **CAT** | `cat` | 2-deploy-cat | Manual approval required |
 | **Production** | `main` | 3-deploy-production | Manual approval + backup |
 
 ## Feature Branch Workflow (Development)
 
-All feature work happens in **feature branches** off `develop`:
+All feature work happens in **feature branches** off `dev`:
 
 ```
-git checkout develop
-git pull origin develop
+git checkout dev
+git pull origin dev
 git checkout -b feature/crm/US-1234/dashboard-control
 # ... make changes in Power Platform Dev environment ...
 # ... commit changes when ready ...
@@ -48,22 +48,22 @@ git push origin feature/crm/US-1234/dashboard-control
 
 **Create Pull Request** on GitHub:
 - From: `feature/crm/US-1234/dashboard-control`
-- To: `develop`
+- To: `dev`
 - Require code review and approval before merge
 
-Once approved and merged to `develop`, the **export-extract workflow** will:
+Once approved and merged to `dev`, the **export-extract workflow** will:
 1. Export your changes from DEV environment
 2. Unpack solution to `solutions/Samlab/` in git
 3. Commit export to git repository
 
-This makes `develop` branch your source of truth with all solution components as XML/JSON files.
+This makes `dev` branch your source of truth with all solution components as XML/JSON files.
 
 ## Promotion Flow (Step-by-Step)
 
 ```
 Feature Branches (feature/crm/US-*/)
       ↓ (Pull Request)
-  develop branch
+  dev branch
       ↓ (All solutions in git)
   power-platform-export-extract.yml ← DEVELOPMENT WORKFLOW
       ↓ (Exports from DEV environment, commits to git)
@@ -165,39 +165,62 @@ Feature Branches (feature/crm/US-*/)
 
 ## GitHub Secrets Setup
 
-You need to configure these secrets in GitHub Settings → Secrets:
+All workflows use **standardized variable names** that can be overridden per environment in GitHub. This means you only need to set one set of secrets per environment.
 
-### For QA:
-```
-QA_ENVIRONMENT_URL     = https://qa.crm.dynamics.com/
-QA_APP_ID              = <service-principal-app-id>
-QA_CLIENT_SECRET       = <service-principal-secret>
-QA_TENANT_ID           = <azure-tenant-id>
-```
+**Setup in GitHub:**
+1. Go to Settings → Environments
+2. Create/edit each environment (DEV, QA, CAT, Production)
+3. Add secrets for that environment
 
-### For CAT:
+### For DEV Environment (Repository Secrets):
+Since DEV is typically used directly for export, add these to **Repository Secrets** (Settings → Secrets and variables → Actions):
 ```
-CAT_ENVIRONMENT_URL    = https://cat.crm.dynamics.com/
-CAT_APP_ID             = <service-principal-app-id>
-CAT_CLIENT_SECRET      = <service-principal-secret>
-CAT_TENANT_ID          = <azure-tenant-id>
+APP_ID             = <service-principal-app-id>
+CLIENT_SECRET      = <service-principal-secret>
+TENANT_ID          = <azure-tenant-id>
 ```
 
-### For Production:
+### For QA Environment:
+Create environment `QA` with these secrets:
 ```
-PROD_ENVIRONMENT_URL   = https://prod.crm.dynamics.com/
-PROD_APP_ID            = <service-principal-app-id>
-PROD_CLIENT_SECRET     = <service-principal-secret>
-PROD_TENANT_ID         = <azure-tenant-id>
+ENVIRONMENT_URL    = https://qa.crm.dynamics.com/
+APP_ID             = <service-principal-app-id>
+CLIENT_SECRET      = <service-principal-secret>
+TENANT_ID          = <azure-tenant-id>
 ```
+
+### For CAT Environment:
+Create environment `CAT` with these secrets:
+```
+ENVIRONMENT_URL    = https://cat.crm.dynamics.com/
+APP_ID             = <service-principal-app-id>
+CLIENT_SECRET      = <service-principal-secret>
+TENANT_ID          = <azure-tenant-id>
+```
+
+### For Production Environment:
+Create environment `Production` with these secrets:
+```
+ENVIRONMENT_URL    = https://prod.crm.dynamics.com/
+APP_ID             = <service-principal-app-id>
+CLIENT_SECRET      = <service-principal-secret>
+TENANT_ID          = <azure-tenant-id>
+```
+
+**Benefits:**
+- Same variable names across all workflows
+- Easy to add new environments (just create new GitHub environment)
+- Secrets are environment-scoped, not workflow-scoped
+- Easy to rotate credentials (just update environment-specific secrets)
+- DEV uses repository-level secrets, deployment envs use their own environment-level secrets
 
 ## Common Workflows
 
 ### Scenario 1: Create & Merge Feature Branch
 ```bash
-# 1. Start from develop
-git checkout develop
-git pull origin develop
+# 1. Start from dev
+git checkout dev
+git pull origin dev
 
 # 2. Create feature branch
 git checkout -b feature/crm/US-1234/new-control
@@ -213,18 +236,18 @@ git push origin feature/crm/US-1234/new-control
 # 5. Create PR in GitHub and get approval
 # (https://github.com/your-repo/pull/new/feature/crm/US-1234/new-control)
 
-# 6. Once approved, merge PR to develop
+# 6. Once approved, merge PR to dev
 # This triggers auto-export of your changes!
 ```
 
-### Scenario 2: Promote develop → qa → CAT → main
+### Scenario 2: Promote dev → qa → CAT → main
 ```bash
-# After feature merged and exported to develop:
+# After feature merged and exported to dev:
 
-# 1. Merge develop changes to qa branch
+# 1. Merge dev changes to qa branch
 git checkout qa
 git pull origin qa
-git rebase develop
+git rebase dev
 git push origin qa
 # → Triggers 1-deploy-qa.yml automatically
 
