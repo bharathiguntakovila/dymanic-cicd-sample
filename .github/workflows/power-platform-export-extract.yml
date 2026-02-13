@@ -108,20 +108,20 @@ jobs:
         run: |
           echo "[STEP] Authenticating to Power Platform environment..."
           echo "[INFO] Environment URL: ${{ env.ENVIRONMENT_URL }}"
-          echo "[INFO] Using application-id: ${{ secrets.APP_ID }}"
-          echo "[INFO] Using tenant: ${{ secrets.TENANT_ID }}"
+          echo "[INFO] Using application-id: ${{ env.APP_ID }}"
+          echo "[INFO] Using tenant: ${{ env.TENANT_ID }}"
           PATH="$PATH:$HOME/.dotnet/tools"
           export PATH
           echo "[INFO] Attempting service principal authentication with cleartext caching..."
           echo "[INFO] Using PAC CLI auth create with:"
-          echo "  - applicationId: ${{ secrets.APP_ID }}"
+          echo "  - applicationId: ${{ env.APP_ID }}"
           echo "  - clientSecret: ***"
-          echo "  - tenant: ${{ secrets.TENANT_ID }}"
+          echo "  - tenant: ${{ env.TENANT_ID }}"
           echo "  - environment: ${{ env.ENVIRONMENT_URL }}"
           $HOME/.dotnet/tools/pac auth create \
-            --applicationId "${{ secrets.APP_ID }}" \
+            --applicationId "${{ env.APP_ID }}" \
             --clientSecret "${{ secrets.CLIENT_SECRET }}" \
-            --tenant "${{ secrets.TENANT_ID }}" \
+            --tenant "${{ env.TENANT_ID }}" \
             --environment "${{ env.ENVIRONMENT_URL }}" \
             --accept-cleartext-caching || {
               echo "[ERROR] Authentication failed"
