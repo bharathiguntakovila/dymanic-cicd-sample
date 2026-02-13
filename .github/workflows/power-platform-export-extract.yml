@@ -105,8 +105,8 @@ jobs:
         run: |
           echo "[STEP] Authenticating to Power Platform environment..."
           echo "[INFO] Environment URL: ${{ env.ENVIRONMENT_URL }}"
-          echo "[INFO] Using application-id: ${{ secrets.POWERPLATFORM_APP_ID }}"
-          echo "[INFO] Using tenant: ${{ secrets.POWERPLATFORM_TENANT_ID }}"
+          echo "[INFO] Using application-id: ${{ secrets.APP_ID }}"
+          echo "[INFO] Using tenant: ${{ secrets.TENANT_ID }}"
           PATH="$PATH:$HOME/.dotnet/tools"
           export PATH
           echo "[INFO] Attempting service principal authentication with cleartext caching..."
@@ -116,9 +116,9 @@ jobs:
           echo "  - tenant: ${{ secrets.TENANT_ID }}"
           echo "  - environment: ${{ env.ENVIRONMENT_URL }}"
           $HOME/.dotnet/tools/pac auth create \
-            --applicationId "${{ secrets.POWERPLATFORM_APP_ID }}" \
-            --clientSecret "${{ secrets.POWERPLATFORM_CLIENT_SECRET }}" \
-            --tenant "${{ secrets.POWERPLATFORM_TENANT_ID }}" \
+            --applicationId "${{ secrets.APP_ID }}" \
+            --clientSecret "${{ secrets.CLIENT_SECRET }}" \
+            --tenant "${{ secrets.TENANT_ID }}" \
             --environment "${{ env.ENVIRONMENT_URL }}" \
             --accept-cleartext-caching || {
               echo "[ERROR] Authentication failed"
@@ -134,7 +134,8 @@ jobs:
       - name: Verify Environment Connection
         run: |
           echo "[STEP] Verifying connection to Power Platform environment..."
-          export PATH="$PATH:$HOME/.dotnet/tools"
+          PATH="$PATH:$HOME/.dotnet/tools"
+          export PATH
           echo "[INFO] Environment: ${{ env.ENVIRONMENT_URL }}"
           
           # List solutions to verify connectivity
