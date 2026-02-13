@@ -11,12 +11,12 @@ on:
 
 # Configuration Variables (update these as needed)
 env:
-  ENVIRONMENT_URL: ${{ secrets.ENVIRONMENT_URL }}
+  ENVIRONMENT_URL: ${{ vars.ENVIRONMENT_URL }}
   SOLUTION_NAME: "Samlab"
   SOLUTION_DIR: solutions/Samlab
-  APP_ID: ${{ secrets.APP_ID }}
+  APP_ID: ${{ vars.APP_ID }}
   CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-  TENANT_ID: ${{ secrets.TENANT_ID }}
+  TENANT_ID: ${{ vars.TENANT_ID }}
 
 jobs:
   deploy-qa:

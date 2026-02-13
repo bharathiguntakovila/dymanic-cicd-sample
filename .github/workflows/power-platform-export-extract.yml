@@ -8,7 +8,10 @@ on:
 # ============================================================================
 env:
   # Power Platform Configuration
-  ENVIRONMENT_URL: "https://indev.crm.dynamics.com"
+  ENVIRONMENT_URL: ${{ vars.ENVIRONMENT_URL }}
+  APP_ID: ${{ vars.APP_ID }}
+  TENANT_ID: ${{ vars.TENANT_ID }}
+  CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
   SOLUTION_NAME: "Samlab"
   SOLUTION_VERSION: "1.0.0"
   
