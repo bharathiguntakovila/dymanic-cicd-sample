@@ -1,22 +1,30 @@
-name: Deploy Solution to CAT
+name: Deploy Solution to Environment
 
 on:
   push:
     branches:
+      - qa
       - cat
+      - main
     paths:
       - 'solutions/**'
-      - '.github/workflows/2-deploy-cat.yml'
+      - '.github/workflows/deploy-solution.yml'
   workflow_dispatch:
   workflow_call:
     inputs:
       environment_name:
-        description: 'Environment name (QA/CAT/Prod)'
+        description: 'Environment name (QA/CAT/Production)'
+        required: true
+        type: string
+      target_branch:
+        description: 'Target branch (qa/cat/main)'
         required: false
-        default: 'CAT'
+        default: 'qa'
         type: string
 
-# Configuration Variables (update these as needed)
+# ============================================================================
+# GLOBAL ENVIRONMENT VARIABLES - Reusable for all environments
+# ============================================================================
 env:
   ENVIRONMENT_URL: ${{ vars.ENVIRONMENT_URL }}
   SOLUTION_NAME: "Samlab"
@@ -26,41 +34,25 @@ env:
   TENANT_ID: ${{ vars.TENANT_ID }}
 
 jobs:
-  approval-gate:
-    runs-on: ubuntu-latest
-    environment:
-      name: CAT
-    steps:
-      - name: "[GATE] Manual Approval Required for CAT Deployment"
-        run: |
-          echo "[INFO] ======================================"
-          echo "[INFO] CAT Deployment Approval Gate"
-          echo "[INFO] ======================================"
-          echo "[INFO] A team member with admin rights must approve this deployment."
-          echo "[INFO] Branch: cat"
-          echo "[INFO] Target Environment: CAT (Customer Acceptance Testing)"
-          echo "[INFO] Time: $(date)"
-          echo "[INFO] ======================================"
-
-  deploy-cat:
-    needs: approval-gate
+  deploy:
+    name: "Deploy to ${{ inputs.environment_name || 'Environment' }}"
     runs-on: ubuntu-latest
     
     steps:
-      - name: "[STEP 1] Display All Environment Variables"
+      - name: "[STEP 1] Display Environment Information"
         run: |
           echo "[INFO] ======================================"
-          echo "[INFO] GitHub Actions Environment Information"
+          echo "[INFO] DEPLOYMENT INFORMATION"
           echo "[INFO] ======================================"
-          echo "[INFO] Workflow Name: ${{ github.workflow }}"
+          echo "[INFO] Workflow: ${{ github.workflow }}"
           echo "[INFO] Event: ${{ github.event_name }}"
           echo "[INFO] Branch: ${{ github.ref_name }}"
           echo "[INFO] Commit: ${{ github.sha }}"
           echo "[INFO] Actor: ${{ github.actor }}"
-          echo "[INFO] Target Environment: CAT"
+          echo "[INFO] Target Environment: ${{ inputs.environment_name || 'QA' }}"
           echo "[INFO] Solution Name: ${{ env.SOLUTION_NAME }}"
           echo "[INFO] Solution Directory: ${{ env.SOLUTION_DIR }}"
-          echo "[INFO] Approval Status: APPROVED"
+          echo "[INFO] Environment URL: ${{ env.ENVIRONMENT_URL }}"
           echo "[INFO] ======================================"
 
       - name: "[STEP 2] Checkout Repository"
@@ -118,10 +110,10 @@ jobs:
           $HOME/.dotnet/tools/pac help 2>&1 | head -20
           echo "[INFO] ======================================"
 
-      - name: "[STEP 7] Authenticate to CAT Environment"
+      - name: "[STEP 7] Authenticate to Power Platform"
         run: |
           echo "[INFO] ======================================"
-          echo "[INFO] Authenticating to CAT Environment"
+          echo "[INFO] Authenticating to ${{ inputs.environment_name || 'QA' }} Environment"
           echo "[INFO] ======================================"
           PATH="$PATH:$HOME/.dotnet/tools"
           export PATH
@@ -140,7 +132,7 @@ jobs:
       - name: "[STEP 8] Verify Environment Connection"
         run: |
           echo "[INFO] ======================================"
-          echo "[INFO] Verifying Connection to CAT Environment"
+          echo "[INFO] Verifying Connection to ${{ inputs.environment_name || 'QA' }} Environment"
           echo "[INFO] ======================================"
           PATH="$PATH:$HOME/.dotnet/tools"
           export PATH
@@ -148,7 +140,7 @@ jobs:
             echo "[ERROR] Failed to connect to environment"
             exit 1
           }
-          echo "[SUCCESS] Connected to CAT environment"
+          echo "[SUCCESS] Connected to ${{ inputs.environment_name || 'QA' }} environment"
           echo "[INFO] ======================================"
 
       - name: "[STEP 9] Pack Solution for Import"
@@ -173,27 +165,28 @@ jobs:
           fi
           echo "[INFO] ======================================"
 
-      - name: "[STEP 10] Import Solution to CAT"
+      - name: "[STEP 10] Import Solution to ${{ inputs.environment_name || 'QA' }}"
         run: |
           echo "[INFO] ======================================"
-          echo "[INFO] Importing Solution to CAT Environment"
+          echo "[INFO] Importing Solution to ${{ inputs.environment_name || 'QA' }} Environment"
           echo "[INFO] ======================================"
           PATH="$PATH:$HOME/.dotnet/tools"
           export PATH
           $HOME/.dotnet/tools/pac solution import \
             --environment "${{ env.ENVIRONMENT_URL }}" \
-            --zipfile "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
-            --force || {
+            --path "/tmp/solutions/${{ env.SOLUTION_NAME }}.zip" \
+            --force-overwrite \
+            --publish-changes || {
             echo "[ERROR] Solution import failed"
             exit 1
           }
           echo "[SUCCESS] Solution imported successfully"
           echo "[INFO] ======================================"
 
-      - name: "[STEP 11] Verify Solution in CAT"
+      - name: "[STEP 11] Verify Solution in ${{ inputs.environment_name || 'QA' }}"
         run: |
           echo "[INFO] ======================================"
-          echo "[INFO] Verifying Solution in CAT Environment"
+          echo "[INFO] Verifying Solution in ${{ inputs.environment_name || 'QA' }} Environment"
           echo "[INFO] ======================================"
           PATH="$PATH:$HOME/.dotnet/tools"
           export PATH
@@ -208,22 +201,21 @@ jobs:
         if: success()
         run: |
           echo "[SUCCESS] ======================================"
-          echo "[SUCCESS] Deployment to CAT Complete!"
+          echo "[SUCCESS] Deployment to ${{ inputs.environment_name || 'QA' }} Complete!"
           echo "[SUCCESS] ======================================"
           echo "[INFO] Solution: ${{ env.SOLUTION_NAME }}"
-          echo "[INFO] Target Environment: CAT"
+          echo "[INFO] Target Environment: ${{ inputs.environment_name || 'QA' }}"
           echo "[INFO] Environment URL: ${{ env.ENVIRONMENT_URL }}"
           echo "[INFO] Deployment Time: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           echo "[INFO] Commit: ${{ github.sha }}"
           echo "[INFO] Branch: ${{ github.ref_name }}"
-          echo "[INFO] Approval: Required and obtained"
           echo "[SUCCESS] ======================================"
 
       - name: "[STEP 13] Upload Deployment Artifacts"
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cat-deployment-artifacts
+          name: solution-deployment-${{ inputs.environment_name || 'qa' }}
           path: /tmp/solutions/
           retention-days: 30
           if-no-files-found: warn
@@ -232,12 +224,13 @@ jobs:
         if: failure()
         run: |
           echo "[ERROR] ======================================"
-          echo "[ERROR] Deployment to CAT Failed!"
+          echo "[ERROR] Deployment to ${{ inputs.environment_name || 'QA' }} Failed!"
           echo "[ERROR] ======================================"
           echo "[ERROR] Please check:"
-          echo "[ERROR] 1. CAT_ENVIRONMENT_URL is correct in secrets"
-          echo "[ERROR] 2. CAT_APP_ID has permissions in CAT environment"
-          echo "[ERROR] 3. CAT_CLIENT_SECRET is valid and not expired"
-          echo "[ERROR] 4. Solution files are properly extracted"
-          echo "[ERROR] 5. No conflicting solutions in CAT"
+          echo "[ERROR] 1. ENVIRONMENT_URL is correct"
+          echo "[ERROR] 2. APP_ID has permissions in the environment"
+          echo "[ERROR] 3. CLIENT_SECRET is valid and not expired"
+          echo "[ERROR] 4. TENANT_ID is correct"
+          echo "[ERROR] 5. Solution files are properly extracted"
+          echo "[ERROR] 6. No conflicting solutions in the target environment"
           echo "[ERROR] ======================================"

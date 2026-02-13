@@ -35,9 +35,10 @@ jobs:
   deploy-qa:
     name: "🟦 QA Deployment"
     needs: stage-1-qa
-    uses: ./.github/workflows/1-deploy-qa.yml
+    uses: ./.github/workflows/deploy-solution.yml
     with:
       environment_name: "QA"
+      target_branch: "qa"
     secrets: inherit
 
   # ========================================================================
@@ -86,9 +87,10 @@ jobs:
   deploy-cat:
     name: "🟨 CAT Deployment"
     needs: stage-2-cat
-    uses: ./.github/workflows/2-deploy-cat.yml
+    uses: ./.github/workflows/deploy-solution.yml
     with:
       environment_name: "CAT"
+      target_branch: "cat"
     secrets: inherit
 
   # ========================================================================
@@ -141,9 +143,10 @@ jobs:
   deploy-prod:
     name: "🔴 Production Deployment"
     needs: stage-3-prod
-    uses: ./.github/workflows/3-deploy-production.yml
+    uses: ./.github/workflows/deploy-solution.yml
     with:
       environment_name: "Production"
+      target_branch: "main"
     secrets: inherit
 
   # ========================================================================
