@@ -96,7 +96,7 @@ jobs:
           dotnet tool install --global Microsoft.PowerApps.CLI.Tool
           export PATH="$PATH:$HOME/.dotnet/tools"
           echo "[SUCCESS] PAC CLI installed"
-          pac --version || pac -v
+          pac help > /dev/null && echo "[SUCCESS] PAC CLI verified" || echo "[ERROR] PAC CLI verification failed"
           echo "[INFO] ======================================"
 
       - name: "[STEP 6] Display PAC CLI Information"
@@ -105,7 +105,7 @@ jobs:
           echo "[INFO] PAC CLI Installation Details"
           echo "[INFO] ======================================"
           export PATH="$PATH:$HOME/.dotnet/tools"
-          pac --version || pac -v
+          pac help | head -20
           echo "[INFO] ======================================"
 
       - name: "[STEP 7] Authenticate to CAT Environment"

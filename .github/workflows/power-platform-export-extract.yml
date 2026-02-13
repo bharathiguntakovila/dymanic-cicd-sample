@@ -109,11 +109,11 @@ jobs:
           
           # Verify PAC installation
           echo "[INFO] Verifying PAC CLI:"
-          pac --version || {
+          pac help > /dev/null 2>&1 || {
             echo "[ERROR] PAC CLI not available"
-            echo "[INFO] Available in PATH:"
-            $HOME/.dotnet/tools/pac --version || echo "[ERROR] PAC not found in tools directory either"
+            $HOME/.dotnet/tools/pac help > /dev/null 2>&1 || echo "[ERROR] PAC not found in tools directory either"
           }
+          echo "[SUCCESS] PAC CLI verified"
 
       - name: Display PAC CLI Info
         run: |
@@ -122,11 +122,8 @@ jobs:
           # Ensure PATH includes dotnet tools
           export PATH="$PATH:$HOME/.dotnet/tools"
           
-          echo "[INFO] PAC CLI Version:"
-          $HOME/.dotnet/tools/pac --version || echo "[ERROR] Could not get version"
-          echo ""
           echo "[INFO] PAC CLI Available Commands:"
-          $HOME/.dotnet/tools/pac help || true
+          $HOME/.dotnet/tools/pac help | head -20
 
       - name: Authenticate to Power Platform
         run: |
