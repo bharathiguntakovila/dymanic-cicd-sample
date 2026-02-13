@@ -12,12 +12,34 @@ on:
 env:
   SOLUTION_NAME: 'Samlab'
 
-jobs:
+jobs:  # ========================================================================
+  # STAGE 0: GENERATE CHANGE REPORT
   # ========================================================================
-  # STAGE 1: QA (Automatic - No Approval)
+  generate-report:
+    name: "📋 Stage 0: Generate Change Report"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: "Starting Change Report Generation"
+        run: |
+          echo "╔════════════════════════════════════════════════════════════════╗"
+          echo "║           PIPELINE STAGE 0: CHANGE REPORT GENERATION          ║"
+          echo "╚════════════════════════════════════════════════════════════════╝"
+          echo ""
+          echo "Status: ▶️  IN PROGRESS"
+          echo "Solution: ${{ env.SOLUTION_NAME }}"
+          echo ""
+
+  create-change-report:
+    name: "📊 Create Change Report"
+    needs: generate-report
+    uses: ./.github/workflows/1-generate-change-report.yml
+    secrets: inherit  # ========================================================================
+  # STAGE 1: QA (Automatic - After Change Report)
   # ========================================================================
   stage-1-qa:
     name: "📦 Stage 1: Deploy to QA"
+    needs: create-change-report
     runs-on: ubuntu-latest
     
     steps:
