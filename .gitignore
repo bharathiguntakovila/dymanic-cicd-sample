@@ -5,6 +5,10 @@ dist/
 *.nupkg
 *.vsix
 
+# Exception: Allow managed solutions to be committed
+!managed-solutions/
+!managed-solutions/*.zip
+
 # Power Platform
 export/
 src/.ref/

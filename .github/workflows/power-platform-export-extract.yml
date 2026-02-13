@@ -279,13 +279,33 @@ jobs:
           echo "[INFO] Git status before commit:"
           git status
           
-          git add "${{ env.SOLUTIONS_DIR }}/" "${{ env.MANAGED_SOLUTIONS_DIR }}/" || echo "[INFO] No files to add"
+          # Check .gitignore to see if it's excluding our files
+          echo "[INFO] Checking .gitignore..."
+          if [ -f ".gitignore" ]; then
+            echo "Current .gitignore contents:"
+            cat .gitignore
+          else
+            echo ".gitignore not found"
+          fi
+          
+          # Explicitly add files
+          echo "[INFO] Adding solutions directory..."
+          git add "${{ env.SOLUTIONS_DIR }}/" -v || echo "[WARNING] Could not add solutions dir"
+          
+          echo "[INFO] Adding managed-solutions directory..."
+          git add "${{ env.MANAGED_SOLUTIONS_DIR }}/" -v || echo "[WARNING] Could not add managed-solutions dir"
+          
+          # Force add if needed
+          echo "[INFO] Force adding ZIP files in case they're excluded..."
+          find "${{ env.MANAGED_SOLUTIONS_DIR }}" -name "*.zip" -exec git add -f {} \; 2>/dev/null || true
           
           echo "[INFO] Changes staged:"
           git status
           
-          git diff --cached --stat || echo "[INFO] No changes to show"
+          echo "[INFO] Staged files summary:"
+          git diff --cached --name-status | head -20 || echo "[INFO] No changes to show"
           
+          echo "[INFO] Creating commit..."
           git commit -m "feat: Export and extract ${{ env.SOLUTION_NAME }} solution
           
           - Exported managed solution to ${{ env.MANAGED_SOLUTIONS_DIR }}/
