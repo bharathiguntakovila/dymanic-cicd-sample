@@ -230,8 +230,8 @@ jobs:
           
           $HOME/.dotnet/tools/pac solution unpack \
             --zipfile "${{ runner.temp }}/${{ env.SOLUTION_NAME }}_unmanaged.zip" \
-            --outputfolder "${{ env.SOLUTIONS_DIR }}/${{ env.SOLUTION_NAME }}" \
-            --type ${{ env.SOLUTION_TYPE }} || {
+            --folder "${{ env.SOLUTIONS_DIR }}/${{ env.SOLUTION_NAME }}" \
+            --packagetype ${{ env.SOLUTION_TYPE }} || {
               echo "[ERROR] Failed to unpack solution"
               exit 1
             }
