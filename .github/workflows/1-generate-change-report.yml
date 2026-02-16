@@ -7,6 +7,10 @@ on:
     paths:
       - 'solutions/**'
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      OPENAI_API_KEY:
+        required: false
 
 env:
   SOLUTION_NAME: "Samlab"
