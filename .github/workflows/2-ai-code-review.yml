@@ -1,0 +1,373 @@
+name: AI Code Review with Azure OpenAI & Power Apps Checker
+
+on:
+  pull_request:
+    branches:
+      - qa
+      - cat
+      - main
+    paths:
+      - 'solutions/**'
+  workflow_dispatch:
+
+env:
+  SOLUTION_NAME: "Samlab"
+  SOLUTION_DIR: solutions/Samlab
+  GIT_USER_NAME: "GitHub Actions"
+  GIT_USER_EMAIL: "actions@github.com"
+
+jobs:
+  ai-code-review:
+    name: "🤖 AI Code Review"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      # ======================================================================
+      # STEP 1: CHECKOUT REPOSITORY
+      # ======================================================================
+      - name: "📥 Checkout Repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ======================================================================
+      # STEP 2: EXTRACT GIT DIFF (Changes between branches)
+      # ======================================================================
+      - name: "📊 Extract Git Diff"
+        id: git-diff
+        run: |
+          echo "[INFO] Comparing branches for solution changes..."
+          
+          # Get the diff stats
+          DIFF_STATS=$(git diff origin/${{ github.base_ref }}..origin/${{ github.head_ref }} -- solutions/ 2>/dev/null || echo "No previous commits")
+          
+          # Get the actual diff (limited to 5000 chars to avoid token limits)
+          DIFF_CONTENT=$(git diff origin/${{ github.base_ref }}..origin/${{ github.head_ref }} -- solutions/ 2>/dev/null | head -c 5000 || echo "Unable to get diff")
+          
+          # Save to file
+          echo "$DIFF_STATS" > /tmp/diff_stats.txt
+          echo "$DIFF_CONTENT" > /tmp/diff_content.txt
+          
+          # Count changes
+          CHANGE_COUNT=$(git diff --name-only origin/${{ github.base_ref }}..origin/${{ github.head_ref }} -- solutions/ 2>/dev/null | wc -l)
+          
+          echo "change_count=$CHANGE_COUNT" >> $GITHUB_OUTPUT
+          echo "[INFO] Changes detected: $CHANGE_COUNT files"
+          
+          # Display summary
+          echo "📝 Diff Summary:"
+          head -20 /tmp/diff_stats.txt
+
+      # ======================================================================
+      # STEP 3: POWER APPS SOLUTION CHECKER
+      # ======================================================================
+      - name: "✅ Run Power Apps Solution Checker"
+        id: pac-checker
+        uses: microsoft/powerplatform-actions/checker@main
+        with:
+          solutionInputFile: ${{ env.SOLUTION_DIR }}/Other/Solution.xml
+        continue-on-error: true
+
+      - name: "📋 Parse PAC Checker Results"
+        id: pac-results
+        run: |
+          echo "[INFO] Parsing Power Apps Checker results..."
+          
+          if [ -f "pscheckerresults.json" ]; then
+            echo "[SUCCESS] Checker results found"
+            
+            # Count issues by severity
+            ERRORS=$(jq '[.[] | select(.level=="Error")] | length' pscheckerresults.json 2>/dev/null || echo "0")
+            WARNINGS=$(jq '[.[] | select(.level=="Warning")] | length' pscheckerresults.json 2>/dev/null || echo "0")
+            INFO=$(jq '[.[] | select(.level=="Informational")] | length' pscheckerresults.json 2>/dev/null || echo "0")
+            
+            echo "errors=$ERRORS" >> $GITHUB_OUTPUT
+            echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
+            echo "info=$INFO" >> $GITHUB_OUTPUT
+            
+            echo "[INFO] Errors: $ERRORS, Warnings: $WARNINGS, Info: $INFO"
+            
+            # Save formatted report
+            cat > /tmp/pac_report.md << EOF
+          ## ✅ Power Apps Solution Checker Results
+          
+          | Severity | Count |
+          |----------|-------|
+          | 🔴 Errors | $ERRORS |
+          | 🟡 Warnings | $WARNINGS |
+          | 🔵 Info | $INFO |
+          
+          ### Detailed Issues
+          \`\`\`json
+          EOF
+            jq '.' pscheckerresults.json 2>/dev/null >> /tmp/pac_report.md || echo "Unable to parse results" >> /tmp/pac_report.md
+            cat >> /tmp/pac_report.md << EOF
+          \`\`\`
+          EOF
+          else
+            echo "[WARNING] No checker results found"
+            echo "errors=0" >> $GITHUB_OUTPUT
+            echo "warnings=0" >> $GITHUB_OUTPUT
+            echo "info=0" >> $GITHUB_OUTPUT
+            echo "## ✅ Power Apps Solution Checker" > /tmp/pac_report.md
+            echo "ℹ️ Checker validation skipped or no results available" >> /tmp/pac_report.md
+          fi
+
+      # ======================================================================
+      # STEP 4: CALL AZURE OPENAI FOR AI ANALYSIS
+      # ======================================================================
+      - name: "🤖 AI Code Review with Azure OpenAI"
+        id: ai-analysis
+        uses: actions/github-script@v7
+        env:
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_DEPLOYMENT_NAME }}
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read git diff
+            let gitDiff = "No changes detected";
+            try {
+              gitDiff = fs.readFileSync('/tmp/diff_content.txt', 'utf8');
+            } catch (e) {
+              console.log("Warning: Could not read diff file");
+            }
+            
+            const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+            const apiKey = process.env.AZURE_OPENAI_API_KEY;
+            const deployment = process.env.AZURE_OPENAI_DEPLOYMENT;
+            
+            // Validate credentials
+            if (!endpoint || !apiKey || !deployment) {
+              core.warning("⚠️ Azure OpenAI credentials not configured");
+              core.setOutput('analysis', 'Azure OpenAI not configured. Please add secrets: AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT_NAME');
+              core.setOutput('risk_level', 'UNKNOWN');
+              return;
+            }
+            
+            const prompt = `You are a Power Platform solution architect reviewing code changes. Analyze these Power Platform solution changes and provide:
+
+            1. **Risk Level**: LOW/MEDIUM/HIGH
+            2. **Summary**: What changed (1-2 sentences)
+            3. **Impact Analysis**: How this could affect the system
+            4. **Breaking Changes**: Any potential compatibility issues
+            5. **Testing Recommendations**: What should be tested
+            
+            Git Diff:
+            \`\`\`diff
+            ${gitDiff}
+            \`\`\`
+            
+            Format response as markdown with clear sections.`;
+            
+            const requestBody = {
+              messages: [
+                {
+                  role: "system",
+                  content: "You are an expert Power Platform solution architect and code reviewer."
+                },
+                {
+                  role: "user",
+                  content: prompt
+                }
+              ],
+              temperature: 0.7,
+              max_tokens: 1500,
+              top_p: 0.95
+            };
+            
+            try {
+              core.info("Calling Azure OpenAI API...");
+              
+              const response = await fetch(
+                \`\${endpoint}openai/deployments/\${deployment}/chat/completions?api-version=2024-02-15-preview\`,
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'api-key': apiKey
+                  },
+                  body: JSON.stringify(requestBody)
+                }
+              );
+              
+              if (!response.ok) {
+                const error = await response.text();
+                throw new Error(\`Azure OpenAI API error: \${response.status} - \${error}\`);
+              }
+              
+              const data = await response.json();
+              const analysis = data.choices[0].message.content;
+              
+              core.info("✅ Azure OpenAI analysis complete");
+              core.setOutput('analysis', analysis);
+              
+              // Extract risk level from response
+              let riskLevel = 'MEDIUM';
+              if (analysis.includes('Risk Level: LOW') || analysis.includes('**Risk Level**: LOW')) {
+                riskLevel = 'LOW';
+              } else if (analysis.includes('Risk Level: HIGH') || analysis.includes('**Risk Level**: HIGH')) {
+                riskLevel = 'HIGH';
+              }
+              core.setOutput('risk_level', riskLevel);
+              
+            } catch (error) {
+              core.error(\`Azure OpenAI API call failed: \${error.message}\`);
+              core.setOutput('analysis', \`⚠️ Unable to complete AI analysis: \${error.message}\`);
+              core.setOutput('risk_level', 'ERROR');
+            }
+
+      # ======================================================================
+      # STEP 5: COMBINE ALL REPORTS
+      # ======================================================================
+      - name: "📝 Combine Reports"
+        id: combined-report
+        run: |
+          cat > /tmp/combined_review.md << 'EOF'
+          # 🤖 AI Code Review Report
+          
+          ## 📊 Review Summary
+          
+          | Metric | Value |
+          |--------|-------|
+          | **PR Base** | `${{ github.base_ref }}` |
+          | **PR Head** | `${{ github.head_ref }}` |
+          | **Files Changed** | ${{ steps.git-diff.outputs.change_count }} |
+          | **Reviewed By** | Azure OpenAI GPT-4 |
+          | **Time** | $(date -u +'%Y-%m-%d %H:%M:%S UTC') |
+          
+          ---
+          
+          ## 🤖 AI Analysis
+          
+          ${{ steps.ai-analysis.outputs.analysis }}
+          
+          ---
+          
+          EOF
+          
+          # Append PAC Checker results
+          if [ -f "/tmp/pac_report.md" ]; then
+            cat /tmp/pac_report.md >> /tmp/combined_review.md
+          fi
+          
+          # Append review guidelines
+          cat >> /tmp/combined_review.md << 'EOF'
+          
+          ---
+          
+          ## 📋 Code Review Checklist
+          
+          Before merging, ensure:
+          
+          - [ ] All **Errors** from Power Apps Checker are resolved
+          - [ ] **Warnings** have been reviewed and accepted or fixed
+          - [ ] No breaking changes introduced
+          - [ ] Testing recommendations have been followed
+          - [ ] Solution is backward compatible
+          - [ ] No hardcoded values or environment-specific configs
+          
+          ---
+          
+          **Generated automatically by GitHub Actions - AI Code Review Workflow**
+          EOF
+          
+          cat /tmp/combined_review.md
+
+      # ======================================================================
+      # STEP 6: POST REVIEW AS PR COMMENT
+      # ======================================================================
+      - name: "💬 Post Review Comment"
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('/tmp/combined_review.md', 'utf8');
+            const riskLevel = '${{ steps.ai-analysis.outputs.risk_level }}';
+            
+            // Determine emoji based on risk level
+            let riskEmoji = '⚠️';
+            if (riskLevel === 'LOW') riskEmoji = '✅';
+            else if (riskLevel === 'HIGH') riskEmoji = '🔴';
+            
+            const reviewBody = `${riskEmoji} **AI Code Review Complete**\n\n${report}`;
+            
+            // Check for existing review comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            
+            const existingComment = comments.find(comment => 
+              comment.user.login === 'github-actions[bot]' && 
+              comment.body.includes('AI Code Review Complete')
+            );
+            
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: reviewBody
+              });
+              core.info("✅ Updated existing code review comment");
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: reviewBody
+              });
+              core.info("✅ Posted new code review comment");
+            }
+
+      # ======================================================================
+      # STEP 7: BLOCK HIGH-RISK MERGES
+      # ======================================================================
+      - name: "🚫 Block High-Risk Merge"
+        if: steps.ai-analysis.outputs.risk_level == 'HIGH'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.warning("🔴 HIGH RISK deployment detected");
+            
+            // Convert PR to draft if high-risk
+            if (context.payload.pull_request && !context.payload.pull_request.draft) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                draft: true
+              });
+              core.notice("🔴 PR converted to DRAFT due to HIGH RISK assessment. Please review AI analysis before proceeding.");
+            }
+
+      # ======================================================================
+      # STEP 8: SUMMARY
+      # ======================================================================
+      - name: "📊 Review Summary"
+        if: always()
+        run: |
+          echo "═══════════════════════════════════════════════════════════════"
+          echo "🤖 AI CODE REVIEW COMPLETE"
+          echo "═══════════════════════════════════════════════════════════════"
+          echo ""
+          echo "📊 Results:"
+          echo "  • Risk Level: ${{ steps.ai-analysis.outputs.risk_level }}"
+          echo "  • Files Changed: ${{ steps.git-diff.outputs.change_count }}"
+          echo "  • PAC Checker Errors: ${{ steps.pac-results.outputs.errors }}"
+          echo "  • PAC Checker Warnings: ${{ steps.pac-results.outputs.warnings }}"
+          echo ""
+          echo "👉 Review Details:"
+          echo "  Go to PR #${{ github.event.pull_request.number }} for full report"
+          echo ""
+          echo "═══════════════════════════════════════════════════════════════"
