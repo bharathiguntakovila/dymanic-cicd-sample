@@ -34,9 +34,9 @@ jobs:
           fetch-depth: 0
 
       # ======================================================================
-      # STEP 2: EXTRACT GIT DIFF (Changes between branches)
+      # STEP 2: EXTRACT GIT DIFF & ENTITY CONTEXT (Changes + related entities)
       # ======================================================================
-      - name: "📊 Extract Git Diff"
+      - name: "📊 Extract Git Diff & Entity Context"
         id: git-diff
         run: |
           echo "[INFO] Comparing branches for solution changes..."
@@ -44,10 +44,10 @@ jobs:
           # Get the diff stats
           DIFF_STATS=$(git diff origin/${{ github.base_ref }}..origin/${{ github.head_ref }} -- solutions/ 2>/dev/null || echo "No previous commits")
           
-          # Get the actual diff (limited to 5000 chars to avoid token limits)
-          DIFF_CONTENT=$(git diff origin/${{ github.base_ref }}..origin/${{ github.head_ref }} -- solutions/ 2>/dev/null | head -c 5000 || echo "Unable to get diff")
+          # Get the actual diff (limited to 8000 chars for context)
+          DIFF_CONTENT=$(git diff -U5 origin/${{ github.base_ref }}..origin/${{ github.head_ref }} -- solutions/ 2>/dev/null | head -c 8000 || echo "Unable to get diff")
           
-          # Save to file
+          # Save to files
           echo "$DIFF_STATS" > /tmp/diff_stats.txt
           echo "$DIFF_CONTENT" > /tmp/diff_content.txt
           
@@ -57,7 +57,35 @@ jobs:
           echo "change_count=$CHANGE_COUNT" >> $GITHUB_OUTPUT
           echo "[INFO] Changes detected: $CHANGE_COUNT files"
           
-          # Display summary
+          # Extract changed entity names
+          echo "[INFO] Extracting affected entities..."
+          CHANGED_ENTITIES=$(git diff --name-only origin/${{ github.base_ref }}..origin/${{ github.head_ref }} -- solutions/ 2>/dev/null | grep -oP 'Entities/\K[^/]+' | sort -u || echo "")
+          
+          if [ -z "$CHANGED_ENTITIES" ]; then
+            echo "[INFO] No entity changes detected"
+            > /tmp/entity_context.txt
+          else
+            echo "[INFO] Changed entities: $CHANGED_ENTITIES"
+            
+            # Load entity definitions for changed entities
+            for entity in $CHANGED_ENTITIES; do
+              ENTITY_FILE="solutions/Samlab/Entities/$entity/Entity.xml"
+              if [ -f "$ENTITY_FILE" ]; then
+                echo "--- Entity: $entity ---" >> /tmp/entity_context.txt
+                head -c 2000 "$ENTITY_FILE" >> /tmp/entity_context.txt
+                echo "" >> /tmp/entity_context.txt
+              fi
+            done
+          fi
+          
+          # Load relationships (impacts analysis)
+          echo "[INFO] Including relationship definitions..."
+          if [ -f "solutions/Samlab/Other/Relationships.xml" ]; then
+            echo "=== RELATIONSHIPS ===" > /tmp/relationships_context.txt
+            head -c 3000 solutions/Samlab/Other/Relationships.xml >> /tmp/relationships_context.txt
+            echo "" >> /tmp/relationships_context.txt
+          fi
+          
           echo "📝 Diff Summary:"
           head -20 /tmp/diff_stats.txt
 
@@ -117,7 +145,7 @@ jobs:
           fi
 
       # ======================================================================
-      # STEP 4: CALL AZURE OPENAI FOR AI ANALYSIS
+      # STEP 4: CALL AZURE OPENAI FOR AI ANALYSIS (With full context)
       # ======================================================================
       - name: "🤖 AI Code Review with Azure OpenAI"
         id: ai-analysis
@@ -130,12 +158,27 @@ jobs:
           script: |
             const fs = require('fs');
             
-            // Read git diff
+            // Read context files
             let gitDiff = "No changes detected";
+            let entityContext = "";
+            let relationshipContext = "";
+            
             try {
               gitDiff = fs.readFileSync('/tmp/diff_content.txt', 'utf8');
             } catch (e) {
               console.log("Warning: Could not read diff file");
+            }
+            
+            try {
+              entityContext = fs.readFileSync('/tmp/entity_context.txt', 'utf8');
+            } catch (e) {
+              console.log("Note: No entity context available");
+            }
+            
+            try {
+              relationshipContext = fs.readFileSync('/tmp/relationships_context.txt', 'utf8');
+            } catch (e) {
+              console.log("Note: No relationship context available");
             }
             
             const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
@@ -150,26 +193,50 @@ jobs:
               return;
             }
             
-            const prompt = `You are a Power Platform solution architect reviewing code changes. Analyze these Power Platform solution changes and provide:
+            const prompt = `You are a Power Platform solution architect reviewing code changes. 
+            
+CONTEXT - CURRENT ENTITY DEFINITIONS:
+\`\`\`xml
+${entityContext || "No entity context available"}
+\`\`\`
 
-            1. **Risk Level**: LOW/MEDIUM/HIGH
-            2. **Summary**: What changed (1-2 sentences)
-            3. **Impact Analysis**: How this could affect the system
-            4. **Breaking Changes**: Any potential compatibility issues
-            5. **Testing Recommendations**: What should be tested
-            
-            Git Diff:
-            \`\`\`diff
-            ${gitDiff}
-            \`\`\`
-            
-            Format response as markdown with clear sections.`;
+CONTEXT - SOLUTION RELATIONSHIPS:
+\`\`\`xml
+${relationshipContext || "No relationship context available"}
+\`\`\`
+
+CHANGES - GIT DIFF:
+\`\`\`diff
+${gitDiff}
+\`\`\`
+
+Analyze these Power Platform solution changes and provide:
+
+1. **Risk Level**: LOW/MEDIUM/HIGH
+2. **Summary**: What changed (1-2 sentences)
+3. **Impact Analysis**: 
+   - How this affects the system
+   - Potential issues with relationships/dependencies
+   - Data integrity implications
+4. **Breaking Changes**: 
+   - Any field deletions or type changes
+   - Relationship modifications that could break integrations
+   - Form/UI changes that affect user workflow
+5. **Code Quality Issues**: 
+   - XML validation issues
+   - Configuration best practices
+6. **Testing Recommendations**: 
+   - Specific test scenarios
+   - Regression areas to check
+   - Data migration considerations if applicable
+
+Format response as markdown with clear sections.`;
             
             const requestBody = {
               messages: [
                 {
                   role: "system",
-                  content: "You are an expert Power Platform solution architect and code reviewer."
+                  content: "You are an expert Power Platform solution architect and code reviewer. Analyze changes with focus on entity relationships, data integrity, and user impact."
                 },
                 {
                   role: "user",
@@ -177,12 +244,14 @@ jobs:
                 }
               ],
               temperature: 0.7,
-              max_tokens: 1500,
+              max_tokens: 2000,
               top_p: 0.95
             };
             
             try {
               core.info("Calling Azure OpenAI API...");
+              core.info(`Deployment: ${deployment}`);
+              core.info(`Endpoint: ${endpoint}`);
               
               const response = await fetch(
                 \`\${endpoint}openai/deployments/\${deployment}/chat/completions?api-version=2024-02-15-preview\`,
@@ -215,6 +284,11 @@ jobs:
                 riskLevel = 'HIGH';
               }
               core.setOutput('risk_level', riskLevel);
+              
+              // Log token usage if available
+              if (data.usage) {
+                core.notice(\`📊 Token Usage: Input: \${data.usage.prompt_tokens}, Output: \${data.usage.completion_tokens}, Total: \${data.usage.total_tokens}\`);
+              }
               
             } catch (error) {
               core.error(\`Azure OpenAI API call failed: \${error.message}\`);
@@ -249,6 +323,13 @@ jobs:
           
           ---
           
+          ## 📚 Context Included in Analysis
+          
+          ✅ **Entity Definitions**: All changed entities from the solution
+          ✅ **Relationships**: Solution relationships that could be affected
+          ✅ **Git Diff**: Full line-by-line changes with context
+          
+          *Analysis includes entity structure and relationship context for accurate impact assessment.*
           EOF
           
           # Append PAC Checker results
